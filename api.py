@@ -7,6 +7,7 @@ import requests
 import sys
 import time
 import socket
+import math
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -16,16 +17,18 @@ class API(object):
 		self.crypter=Crypter()
 		self.s=requests.session()
 		self.s.verify=False
-		self.s.headers.update({'User-Agent':'SMON_Kr/3.7.8.37800 CFNetwork/808.2.16 Darwin/16.3.0'})
+		self.s.headers.update({'User-Agent':'SMON_Kr/3.7.9.37900 CFNetwork/808.2.16 Darwin/16.3.0'})
 		if 'Admin-PC' == socket.gethostname():
 			self.s.proxies.update({'http': 'http://127.0.0.1:8888','https': 'https://127.0.0.1:8888',})
 		self.game_index=2623
 		self.proto_ver=11060
-		self.app_version='3.7.8'
+		self.app_version='3.7.9'
 		self.c2_api='http://summonerswar-%s.qpyou.cn/api/gateway_c2.php'
 		self.uid=int(uid)
 		self.did=int(did)
 		self.isHive=False
+		self.ts_val = 0
+		self.session_start = math.ceil(time.time())
 		if id and email:
 			self.log('hive account')
 			self.id=id
@@ -64,6 +67,12 @@ class API(object):
 		res= self.crypter.decrypt_response(res.content,2 if '_c2.php' in path else 1)
 		if 'wizard_info' in res and 'wizard_id' in res:
 			self.updateWizard(json.loads(res)['wizard_info'])
+		if '\'ts_val\'' in res or '\"ts_val\"' in res:
+			try:
+				self._update_ts_val(json.loads(res)['ts_val])
+			except KeyError:
+				self.log('Error logging ts_val')
+				self.log(json.loads(res))
 		rj=json.loads(res)
 		if 'ret_code' in res:
 			if rj['ret_code']<>0:
@@ -98,10 +107,11 @@ class API(object):
 				self.infocsv=v['version']
 	
 	def base_data(self,cmd,kind=1):
+		ts_val = self.ts_val + math.ceil(time.time()) - self.session_start
 		if kind == 1:
 			data=OrderedDict([('command',cmd),('game_index',self.game_index),('session_key',self.getUID()),('proto_ver',self.proto_ver),('infocsv',self.infocsv),('channel_uid',self.uid)])
 		elif kind ==2:
-			data=OrderedDict([('command',cmd),('wizard_id',self.wizard_id),('session_key',self.getUID()),('proto_ver',self.uid),('infocsv',self.infocsv),('channel_uid',self.uid),('ts_val','1178454877')])
+			data=OrderedDict([('command',cmd),('wizard_id',self.wizard_id),('session_key',self.getUID()),('proto_ver',self.uid),('infocsv',self.infocsv),('channel_uid',self.uid),('ts_val', ts_val)])
 		return data
 
 	def CheckLoginBlock(self):
@@ -249,6 +259,10 @@ class API(object):
 		if hasattr(self, 'user'):
 			self.user['wizard_info']=input
 			self.log(self.getUserInfo())
+							    
+	def _update_ts_val(self, input_):
+		self.ts_val = input_
+		self.session_start = math.ceil(time.time())
 	
 	def getUserInfo(self):
 		return 'id:%s username:%s energy:%s mana:%s crystal:%s'%(self.user['wizard_info']['wizard_id'],self.user['wizard_info']['wizard_name'],self.user['wizard_info']['wizard_energy'],self.user['wizard_info']['wizard_mana'],self.user['wizard_info']['wizard_crystal'])
