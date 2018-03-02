@@ -1751,6 +1751,13 @@ class API(object):
             except KeyError:
                 self.log('Error logging deco_info')
                 self.log(json.loads(res))
+        if isIn('building_info', res):
+            try:
+                self._updateBuildings(json.loads(res)['building_info'])
+                self.log(self._getBuildings())
+            except KeyError:
+                self.log('Error logging building_info')
+                self.log(json.loads(res))
         if isIn('deco_list', res):
             try:
                 self._update_deco_list(json.loads(res)['deco_list'])
