@@ -1406,16 +1406,14 @@ class API(object):
             mac = '02:00:00:00:00:00'
             token = ''
         else:
-            device_name = 'iPad5,4'
-            os_version = '10.2'
+            device_name = 'SM-G955F'
+            os_version = '7.0'
             mac = '02:00:00:00:00:00'
             token = '0000000000000000000000000000000000000000000000000000000000000000'
-            self.binary_size = 10448304
-            self.binary_check = '87c2986b797cfdf61e5816809395ad8d'
         data = OrderedDict([('command', 'HubUserLogin'), ('game_index', self.game_index), ('proto_ver', self.proto_ver),
                             ('app_version', self.app_version), ('session_key', self.session_key),
                             ('infocsv', self.infocsv), ('uid', self.uid), ('channel_uid', self.uid), ('did', self.did),
-                            ('id', self.id), ('email', self.email), ('push', 1), ('is_emulator', 0), ('country', 'DE'),
+                            ('id', self.id), ('email', self.email), ('push', 1), ('is_emulator', 0), ('country', 'EN'),
                             ('lang', 'eng'), ('lang_game', 1), ('mac_address', mac),
                             ('device_name', device_name), ('os_version', os_version),
                             ('token', token), ('idfv', ''), ('adid', ''),
