@@ -119,13 +119,13 @@ class QPYOU(object):
             vend_id = rndDeviceId()
         else:
             ad_id = rndDeviceId()
-            device = 'iPad5,4'
-            appid = 'com.com2us.smon.normal.freefull.apple.kr.ios.universal'
-            native_ver = 'Hub v.2.6.4'
-            osversion = '10.2'
-            platform = 'ios'
-            user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like Mac OS X) AppleWebKit/602.3.12 (KHTML, ' \
-                         'like Gecko) Version/10.0 Mobile/14C92 Safari/602.1 '
+            device = 'SM-G955F'
+            appid = 'com.com2us.smon.normal.freefull.google.kr.android.common'
+            native_ver = 'Hive+v.2.6.5'
+            osversion = '7.0'
+            platform = 'android'
+            user_agent = 'Mozilla/5.0 (Linux; Android 7.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, ' \
+                         'like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36 '
             vend_id = rndDeviceId()
         self.s.cookies.update(
             {'advertising_id': ad_id, 'appid': appid,
