@@ -41,8 +41,8 @@ class API(object):
         # if 'Admin-PC' == socket.gethostname():
         #     self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.game_index = 2624
-        self.proto_ver = 11070
-        self.app_version = '3.7.9'
+        self.proto_ver = 11080
+        self.app_version = '3.8.0'
         net_version = self.app_version.split('.')
         net_version_str = ''.join(net_version)
         net_version_str = ''.join([net_version_str, '0' * (5 - len(net_version_str))])
@@ -53,8 +53,8 @@ class API(object):
             version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
             net_version = version.split('.')
             given_version = self.app_version.split('.')
-            self.binary_size = 22953472
-            self.binary_check = '28ab5c90bb780c5ae3ff2e87ec525b91'
+            self.binary_size = 27464880
+            self.binary_check = 'b3d5fa221101fb4c9e8184ad70c17c70'
             print(self.binary_check, self.binary_size)
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
                                                             for i in range(len(net_version))]):
