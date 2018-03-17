@@ -50,7 +50,13 @@ class API(object):
         if app_id and 'android' in str(app_id):
             version_req = requests.get('https://play.google.com/store/apps/details?id=' + app_id).text
             soup = BeautifulSoup(version_req, "html.parser")
-            version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
+            version = None
+            while not version:
+                try:
+                    version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
+                except:
+                    self.log('Error retrieving recent app version, try again in 5s')
+                    time.sleep(5)
             net_version = version.split('.')
             given_version = self.app_version.split('.')
             self.binary_size = 27464880
@@ -72,8 +78,14 @@ class API(object):
         elif app_id and 'ios' in str(app_id):
             version_req = requests.get('https://itunes.apple.com/de/app/summoners-war-sky-arena/id852912420').text
             soup = BeautifulSoup(version_req, "html.parser")
-            version = soup.find('p', {'class': 'l-column small-6 medium-12 whats-new__latest__version'}).text.replace(
-                'Version', '').strip()
+            version = None
+            while not version:
+                try:
+                    version = soup.find('p', {'class': 'l-column small-6 medium-12 whats-new__latest__version'}).text.replace(
+                        'Version', '').strip()
+                except:
+                    self.log('Error retrieving recent app version, try again in 5s')
+                    time.sleep(5)
             net_version = version.split('.')
             given_version = self.app_version.split('.')
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
