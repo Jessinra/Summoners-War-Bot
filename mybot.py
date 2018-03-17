@@ -1006,7 +1006,7 @@ class Bot:
                                         [{'ach_id': quest_id, 'cond_id': condition_[0], 'current': condition_[2] + 1}])
 
                 time.sleep(5)
-		self.bot.level8()
+                self.bot.level8()
 
     def moveUnitsFromStorage(self, unit_ids):
         space_left = self.getMonsterSpaceLeft()
