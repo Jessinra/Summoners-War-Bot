@@ -1,4 +1,5 @@
-from tools import rndDeviceId, Pkcs7Encoder
+from tools import rndDeviceId
+from crypt import Pkcs7Encoder
 import hashlib
 import json
 import random
