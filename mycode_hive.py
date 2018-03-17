@@ -8,13 +8,13 @@ my_password='hallo123'
 
 uid,did,sessionkey,appId=QPYOU('236145028').hiveLogin(my_hivelogin,my_password)
 a=API(uid,did,my_hivelogin,my_email,sessionkey,device=None,app_id=appId)
-a.setRegion('eu')
-a.setIDFA(rndDeviceId())
+a.set_region('eu')
+a.set_idfa(rndDeviceId())
 a.getServerStatus()
 a.getVersionInfo()
 a.CheckLoginBlock()
 a.login()
-a.doMission(1,1,1)#garen forest outskirts
-a.doMission(1,2,1)#garen forest south
-a.doMission(1,3,1)#garen forest east
-a.doMission(1,4,1)#garen forest paths
+#a.doMission(1,1,1)#garen forest outskirts
+#a.doMission(1,2,1)#garen forest south
+#a.doMission(1,3,1)#garen forest east
+#a.doMission(1,4,1)#garen forest paths
