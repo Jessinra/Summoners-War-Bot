@@ -2,12 +2,15 @@ from api import API
 from qpyou import QPYOU
 from tools import rndDeviceId
 
-my_email='s@mila432.com'
-my_hivelogin='mila432f'
-my_password='hallo123'
+my_email=''
+my_hivelogin=''
+my_password=''
+# Leave empty if you don't know device id
+device_id = ''
+device = ''
 
-uid,did,sessionkey,appId=QPYOU('236145028').hiveLogin(my_hivelogin,my_password)
-a=API(uid,did,my_hivelogin,my_email,sessionkey,device=None,app_id=appId)
+uid,did,sessionkey,appId=QPYOU(device_id, device).hiveLogin(my_hivelogin,my_password)
+a=API(uid,did,my_hivelogin,my_email,sessionkey,device=device,app_id=appId)
 a.set_region('eu')
 a.set_idfa(rndDeviceId())
 a.getServerStatus()
