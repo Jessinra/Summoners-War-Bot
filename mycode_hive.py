@@ -18,12 +18,12 @@ try:
         if data.get('device_id'):
             device_id = data.get('device_id')
         else:
-            device_id = random.randint(200000000, 300000000)
+            device_id = str(random.randint(200000000, 300000000))
             data.update({'device_id': device_id})
 except FileNotFoundError:
     with open('config.json', 'w') as f:
         data = {
-            'device_id': random.randint(200000000, 300000000)
+            'device_id': str(random.randint(200000000, 300000000))
         }
         f.write(json.dumps(data))
 
