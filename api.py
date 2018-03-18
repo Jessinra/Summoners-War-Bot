@@ -53,10 +53,13 @@ class API(object):
             ua = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'
             headers = {'User-Agent': ua, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
             sess_ver.headers.update(headers)
-            version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
-            soup = BeautifulSoup(version_req, "html.parser")
             version = None
-            while not version:
+            tries = 0
+            max_tries = 5
+            while not version and tries < max_tries:
+                version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
+                soup = BeautifulSoup(version_req, "html.parser")
+                tries += 1
                 try:
                     version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
                 except AttributeError:
@@ -64,6 +67,9 @@ class API(object):
                     help_list = [tag for tag in vers.parent]
                     if help_list:
                         version = help_list[-1].text
+                if tries == max_tries:
+                    self.log('Finding recent version failed 5 times, now quitting for safety reasons.)
+                    return;
             net_version = version.split('.')
             given_version = self.app_version.split('.')
             self.binary_size = 27464880
