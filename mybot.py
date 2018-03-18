@@ -1108,46 +1108,50 @@ class Bot:
         return self.bot.pvp_info['arena_score']
 
     def ArenaHandler(self):
-        self.bot.GetArenaLog()
-        if time.time() - self.last_arena_refresh > 120:
-            self.last_arena_refresh = time.time()
-            self.bot.GetArenaWizardList(refresh=1)
-        else:
-            self.bot.GetArenaWizardList()
+        if self.bot.pvp_info.get('rating_remained') <= 601200:
+            self.bot.GetArenaLog()
+            if time.time() - self.last_arena_refresh > 120:
+                self.last_arena_refresh = time.time()
+                self.bot.GetArenaWizardList(refresh=1)
+            else:
+                self.bot.GetArenaWizardList()
 
-        npc_list = []
-        revenge_list = []
-        arena_fight_list = []
+            npc_list = []
+            revenge_list = []
+            arena_fight_list = []
 
-        for npc, info_ in self.bot.npc_list.items():
-            if info_['next_battle'] <= 0:
-                npc_list.append(npc)
+            for npc, info_ in self.bot.npc_list.items():
+                if info_['next_battle'] <= 0:
+                    npc_list.append(npc)
 
-        for wizard, info_ in self.bot.arena_log.items():
-            if info_['STATUS'] == 0:
+            for wizard, info_ in self.bot.arena_log.items():
+                if info_['STATUS'] == 0:
+                    opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
+                    if info_['opp_arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
+                            or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
+                        revenge_list.append([wizard, info_['log_id']])
+
+            for wizard, info_ in self.bot.arena_list.items():
                 opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
-                if info_['opp_arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
+                if info_['arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
                         or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
-                    revenge_list.append([wizard, info_['log_id']])
+                    arena_fight_list.append(wizard)
 
-        for wizard, info_ in self.bot.arena_list.items():
-            opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
-            if info_['arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
-                    or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
-                arena_fight_list.append(wizard)
-
-        return npc_list, revenge_list, arena_fight_list
+            return npc_list, revenge_list, arena_fight_list
+        return None, None, None
 
     def ArenaListNpc(self):
-        self.bot.GetArenaWizardList()
+        if self.bot.pvp_info.get('rating_remained') <= 601200:
+            self.bot.GetArenaWizardList()
 
-        npc_list = []
+            npc_list = []
 
-        for npc, info_ in self.bot.npc_list.items():
-            if info_['next_battle'] <= 0:
-                npc_list.append(npc)
+            for npc, info_ in self.bot.npc_list.items():
+                if info_['next_battle'] <= 0:
+                    npc_list.append(npc)
 
-        return npc_list
+            return npc_list
+        return None
 
     def ArenaFighterNpc(self, units=None):
         npc_list = self.ArenaListNpc()
