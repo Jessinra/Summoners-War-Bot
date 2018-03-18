@@ -68,7 +68,7 @@ class API(object):
                     if help_list:
                         version = help_list[-1].text
                 if tries == max_tries:
-                    self.log('Finding recent version failed 5 times, now quitting for safety reasons.)
+                    self.log('Finding recent version failed 5 times, now quitting for safety reasons.')
                     return;
             net_version = version.split('.')
             given_version = self.app_version.split('.')
