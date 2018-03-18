@@ -1431,10 +1431,13 @@ if __name__ == "__main__":
     user = ''
     user_mail = ''
     pw = ''
-    # device id
-    device_id = 'xxx'
+    # device id, leave empty if you don't know yours
+    device_id = ''
+    # device name configurable in api and qpyou, leave empty if you haven't prepared a configuration
+    device = ''
+    # set to your region code ('eu', etc.) find codes in api.py -> set_region
     region = ''
-    autoplay = Bot(user, user_mail, pw, device_id, region)
+    autoplay = Bot(user, user_mail, pw, device_id, device, region)
 	# Items to buy from shop
     item_list = [9, 13]
     while True:
