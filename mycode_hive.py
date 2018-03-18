@@ -18,6 +18,31 @@ a.getServerStatus()
 a.getVersionInfo()
 a.CheckLoginBlock()
 a.login()
+a.GetDailyQuests()
+a.GetMiscReward()
+a.GetMailList()
+a.CheckDailyReward()
+a.GetArenaLog()
+a.CheckDarkPortalStatus()
+a.GetCostumeCollectionList()
+a.ReceiveDailyRewardSpecial()
+a.receiveDailyRewardInactive()
+a.GetFriendRequest()
+a.getUnitUpgradeRewardInfo()
+a.GetRTPvPInfo_v3()
+a.GetChatServerInfo()
+a.getRtpvpRejoinInfo()
+a.GetEventTimeTable()
+a.GetNoticeChat()
+a.GetNoticeDungeon()
+a.GetDungeonList()
+a.GetInstanceList()
+a.gettrialtowerupdateremained()
+a.GetTrialTowerInfo_v2()
+
+# add your things afterwards
+
+
 #a.doMission(1,1,1)#garen forest outskirts
 #a.doMission(1,2,1)#garen forest south
 #a.doMission(1,3,1)#garen forest east
