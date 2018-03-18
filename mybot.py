@@ -1138,7 +1138,7 @@ class Bot:
                     arena_fight_list.append(wizard)
 
             return npc_list, revenge_list, arena_fight_list
-        return None, None, None
+        return [], [], []
 
     def ArenaListNpc(self):
         self.bot.GetArenaWizardList()
@@ -1149,7 +1149,7 @@ class Bot:
                     npc_list.append(npc)
 
             return npc_list
-        return None
+        return []
 
     def ArenaFighterNpc(self, units=None):
         npc_list = self.ArenaListNpc()
