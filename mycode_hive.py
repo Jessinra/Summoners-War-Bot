@@ -22,8 +22,9 @@ try:
             data.update({'device_id': device_id})
 except FileNotFoundError:
     with open('config.json', 'w') as f:
+        device_id = str(random.randint(200000000, 300000000))
         data = {
-            'device_id': str(random.randint(200000000, 300000000))
+            'device_id': device_id
         }
         f.write(json.dumps(data))
 
