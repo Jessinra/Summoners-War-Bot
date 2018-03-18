@@ -19,6 +19,24 @@ from tools import find, get_monster_name_by_id
 
 class Bot:
     def __init__(self, user_='', user_mail_='', pw_='', device_id_='', device_=None, region_='eu'):
+	    if not device_id_:
+	        try:
+                with open('config.json', 'r') as f:
+                    data = json.load(f)
+                    if data.get('device_id'):
+                        device_id_ = data.get('device_id')
+                    else:
+                        device_id_ = str(random.randint(200000000, 300000000))
+                        data.update({'device_id': device_id})
+                with open('config.json', 'w') as f:
+                    f.write(json.dumps(data))
+            except FileNotFoundError:
+                with open('config.json', 'w') as f:
+                    device_id_ = str(random.randint(200000000, 300000000))
+                    data = {
+                        'device_id': device_id_
+                    }
+                    f.write(json.dumps(data))
         self.uid, self.did, self.sessionkey, appID = QPYOU(device_id_, device_).hiveLogin(user_, pw_)
         self.bot = API(self.uid, self.did, user_, user_mail_, self.sessionkey, device_, appID)
         self.bot.set_region(region_)
