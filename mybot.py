@@ -1108,8 +1108,8 @@ class Bot:
         return self.bot.pvp_info['arena_score']
 
     def ArenaHandler(self):
+		self.bot.GetArenaLog()
         if self.bot.pvp_info.get('rating_remained') <= 601200:
-            self.bot.GetArenaLog()
             if time.time() - self.last_arena_refresh > 120:
                 self.last_arena_refresh = time.time()
                 self.bot.GetArenaWizardList(refresh=1)
@@ -1141,11 +1141,9 @@ class Bot:
         return None, None, None
 
     def ArenaListNpc(self):
+        self.bot.GetArenaWizardList()
         if self.bot.pvp_info.get('rating_remained') <= 601200:
-            self.bot.GetArenaWizardList()
-
             npc_list = []
-
             for npc, info_ in self.bot.npc_list.items():
                 if info_['next_battle'] <= 0:
                     npc_list.append(npc)
