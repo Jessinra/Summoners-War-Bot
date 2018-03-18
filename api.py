@@ -11,6 +11,7 @@ import ast
 import random
 import socket
 import threading
+from fake_useragent import UserAgent
 import requests
 import urllib3
 from bs4 import BeautifulSoup
@@ -48,15 +49,20 @@ class API(object):
         net_version_str = ''.join([net_version_str, '0' * (5 - len(net_version_str))])
         self.s.headers.update({'User-Agent': ''.join(['SMON_KR/', str(self.app_version), '.', net_version_str, ' CFNetwork/808.2.16 Darwin/16.3.0'])})
         if app_id and 'android' in str(app_id):
-            version_req = requests.get('https://play.google.com/store/apps/details?id=' + app_id).text
+            sess_ver = requests.Session()
+            headers = {'User-Agent': UserAgent().random, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
+            sess_ver.headers.update(headers)
+            version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
             soup = BeautifulSoup(version_req, "html.parser")
             version = None
             while not version:
                 try:
                     version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
-                except:
+                except AttributeError:
                     self.log('Error retrieving recent app version, try again in 5s')
                     time.sleep(5)
+                    version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
+                    soup = BeautifulSoup(version_req, 'html.parser')
             net_version = version.split('.')
             given_version = self.app_version.split('.')
             self.binary_size = 27464880
