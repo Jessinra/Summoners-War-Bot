@@ -1324,9 +1324,9 @@ class Bot:
             # print(open_ach)
             try:
                 index = find(achievements, 'quest id', str(open_ach))
-                open_quest_list.append([open_ach, item_['conditions'], achievements[index]['title_en'],
-                                        ast.literal_eval(achievements[index]['conditions']),
-                                        ast.literal_eval(achievements[index]['req id'])])
+                open_quest_list.append([open_ach, item_['conditions'], achievements[index].get('title_en'),
+                                        ast.literal_eval(achievements[index].get('conditions')),
+                                        ast.literal_eval(achievements[index].get('req id'))])
             except ValueError:
                 self.bot.log('Open quest: {} not founrd.'.format(open_ach))
         self.bot.log(open_quest_list)
