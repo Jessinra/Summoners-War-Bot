@@ -50,7 +50,8 @@ class API(object):
         self.s.headers.update({'User-Agent': ''.join(['SMON_KR/', str(self.app_version), '.', net_version_str, ' CFNetwork/808.2.16 Darwin/16.3.0'])})
         if app_id and 'android' in str(app_id):
             sess_ver = requests.Session()
-            headers = {'User-Agent': UserAgent().random, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
+            ua = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'
+            headers = {'User-Agent': ua, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
             sess_ver.headers.update(headers)
             version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
             soup = BeautifulSoup(version_req, "html.parser")
