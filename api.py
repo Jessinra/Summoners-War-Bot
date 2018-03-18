@@ -60,15 +60,16 @@ class API(object):
                 try:
                     version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
                 except AttributeError:
-                    self.log('Error retrieving recent app version, try again in 5s')
-                    time.sleep(5)
-                    version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
-                    soup = BeautifulSoup(version_req, 'html.parser')
+                    vers = soup.find('div', text='Current Version')
+                    help_list = [tag for tag in vers.parent]
+                    if help_list:
+                        version = help_list[-1].text
             net_version = version.split('.')
             given_version = self.app_version.split('.')
             self.binary_size = 27464880
             self.binary_check = 'b3d5fa221101fb4c9e8184ad70c17c70'
             print(self.binary_check, self.binary_size)
+            sess_ver.close()
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
                                                             for i in range(len(net_version))]):
                 self.app_version = version
