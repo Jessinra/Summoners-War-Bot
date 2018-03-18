@@ -1519,25 +1519,28 @@ class API(object):
         time.sleep(3)
 
     def doArena(self, opp_wizard_id, units=None, win_lose=1, log_id=0, is_npc=False):
-        if opp_wizard_id not in [wizard for wizard in self.arena_list] \
-                and opp_wizard_id not in [wizard for wizard in self.arena_log] \
-                and not is_npc:
-            self.log('No valid opponent to battle.')
-            return
-        if opp_wizard_id in [wizard for wizard in self.arena_log]:
-            log_id = self.arena_log[opp_wizard_id]['log_id']
-        unit_id_list = [{'unit_id': unit['unit_id']} for unit in
-                        self.defense_unit_list] if not units else units[:4]
-        arena_start = self.BattleArenaStart(opp_wizard_id, unit_id_list, log_id) if log_id else self.BattleArenaStart(
-            opp_wizard_id, unit_id_list)
-        if not arena_start:
-            self.log('Battle not successfully started.')
-            return
-        battle_key, opp_unit_status_list = API.parseBattleStart(arena_start, win_lose)
-        time.sleep(random.randint(30, 40))
-        arena_end = self.BattleArenaResult(battle_key, opp_unit_status_list, unit_id_list, win_lose)
-        self.parseBattleResult(arena_end)
-        time.sleep(3)
+        if self.bot.pvp_info.get('rating_remained') <= 601200:
+            if opp_wizard_id not in [wizard for wizard in self.arena_list] \
+                    and opp_wizard_id not in [wizard for wizard in self.arena_log] \
+                    and not is_npc:
+                self.log('No valid opponent to battle.')
+                return
+            if opp_wizard_id in [wizard for wizard in self.arena_log]:
+                log_id = self.arena_log[opp_wizard_id]['log_id']
+            unit_id_list = [{'unit_id': unit['unit_id']} for unit in
+                            self.defense_unit_list] if not units else units[:4]
+            arena_start = self.BattleArenaStart(opp_wizard_id, unit_id_list, log_id) if log_id else self.BattleArenaStart(
+                opp_wizard_id, unit_id_list)
+            if not arena_start:
+                self.log('Battle not successfully started.')
+                return
+            battle_key, opp_unit_status_list = API.parseBattleStart(arena_start, win_lose)
+            time.sleep(random.randint(30, 40))
+            arena_end = self.BattleArenaResult(battle_key, opp_unit_status_list, unit_id_list, win_lose)
+            self.parseBattleResult(arena_end)
+            time.sleep(3)
+        else:
+            self.log('No Arena fights during Reset hour.')
 
     def doToa(self, difficulty, floor_id, clear_time, units=None, win_lose=1):
         if 100 >= floor_id > self.trial_tower_list[difficulty]['cleared'] + 1:
