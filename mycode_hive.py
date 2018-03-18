@@ -10,7 +10,6 @@ my_password=''
 # Leave empty if you don't know device id
 device_id = ''
 device = ''
-data = {}
 
 try:
     with open('config.json', 'r') as f:
@@ -20,6 +19,8 @@ try:
         else:
             device_id = str(random.randint(200000000, 300000000))
             data.update({'device_id': device_id})
+    with open('config.json', 'w') as f:
+        f.write(json.dumps(data))
 except FileNotFoundError:
     with open('config.json', 'w') as f:
         device_id = str(random.randint(200000000, 300000000))
