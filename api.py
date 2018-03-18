@@ -1519,7 +1519,7 @@ class API(object):
         time.sleep(3)
 
     def doArena(self, opp_wizard_id, units=None, win_lose=1, log_id=0, is_npc=False):
-        if self.bot.pvp_info.get('rating_remained') <= 601200:
+        if self.pvp_info.get('rating_remained') <= 601200:
             if opp_wizard_id not in [wizard for wizard in self.arena_list] \
                     and opp_wizard_id not in [wizard for wizard in self.arena_log] \
                     and not is_npc:
