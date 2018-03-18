@@ -1382,7 +1382,7 @@ class Bot:
                 pending_requests = self.bot.GetFriendRequestSend()['friend_req_list']
                 recommended_friends = self.bot.GetFriendRecommended()
                 for recommended_friend in recommended_friends['recommended_list']:
-                    if recommended_friend['wizard_id'] not in [info_['wizard_id'] for
+                    if recommended_friend['wizard_id'] not in [friend for
                                                                friend, info_ in self.bot.friend_list.items()] \
                             and recommended_friend['wizard_id'] not in [pending['wizard_id'] for
                                                                         pending in pending_requests]:
