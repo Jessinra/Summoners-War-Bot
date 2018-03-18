@@ -13,6 +13,7 @@ uid,did,sessionkey,appId=QPYOU(device_id, device).hiveLogin(my_hivelogin,my_pass
 a=API(uid,did,my_hivelogin,my_email,sessionkey,device=device,app_id=appId)
 a.set_region('eu')
 a.set_idfa(rndDeviceId())
+a.getLocation()
 a.getServerStatus()
 a.getVersionInfo()
 a.CheckLoginBlock()
