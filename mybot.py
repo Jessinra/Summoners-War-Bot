@@ -491,9 +491,12 @@ class Bot:
                 break
 
     def doDailyWish(self):
-        wish_outcome = self.bot.DoRandomWishItem()['wish_info']
-        self.bot.log('Wish granted {} with amount of {}'.format(inventory_type_map[wish_outcome['item_master_type']],
-                                                                wish_outcome['amount']))
+        if 10 in self.bot.buildings:
+            wish_outcome = self.bot.DoRandomWishItem()['wish_info']
+            self.bot.log('Wish granted {} with amount of {}'.format(inventory_type_map[wish_outcome['item_master_type']],
+                                                                    wish_outcome['amount']))
+        else:
+            self.bot.log('Temple of wishes not built yet')
 
     def collectAllMail(self):
         # collects all mails, but not social points
