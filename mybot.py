@@ -19,8 +19,8 @@ from tools import find, get_monster_name_by_id
 
 class Bot:
     def __init__(self, user_='', user_mail_='', pw_='', device_id_='', device_=None, region_='eu'):
-	    if not device_id_:
-	        try:
+        if not device_id_:
+            try:
                 with open('config.json', 'r') as f:
                     data = json.load(f)
                     if data.get('device_id'):
