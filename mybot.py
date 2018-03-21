@@ -16,7 +16,6 @@ from qpyou import QPYOU
 from tools import find, get_monster_name_by_id
 
 
-
 class Bot:
     def __init__(self, user_='', user_mail_='', pw_='', device_id_='', device_=None, region_='eu'):
         if not device_id_:
@@ -1111,7 +1110,7 @@ class Bot:
         return self.bot.pvp_info['arena_score']
 
     def ArenaHandler(self):
-		self.bot.GetArenaLog()
+        self.bot.GetArenaLog()
         if self.bot.pvp_info.get('rating_remained') <= 601200:
             if time.time() - self.last_arena_refresh > 120:
                 self.last_arena_refresh = time.time()
