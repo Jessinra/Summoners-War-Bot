@@ -135,8 +135,8 @@ class Bot:
             return pos_x, pos_y
 
     def buyWeeklyGuildRainbowmon(self):
-        self.bot.log(self.bot.shop_interval_list)
-        self.bot.log(self.bot.shop_item_list)
+        # self.bot.log(self.bot.shop_interval_list)
+        # self.bot.log(self.bot.shop_item_list)
         try:
             if self.bot.shop_interval_list[1200005]['remained_time'] <= 0:
                 if self.getMonsterSpaceLeft() > 0:
@@ -188,14 +188,14 @@ class Bot:
             return
 
     def buyWeeklyDevilmon(self):
-        self.bot.log(self.bot.shop_interval_list)
-        self.bot.log(self.bot.shop_item_list)
+        # self.bot.log(self.bot.shop_interval_list)
+        # self.bot.log(self.bot.shop_item_list)
         try:
             if self.bot.shop_interval_list[901002]['remained_time'] <= 0:
                 if self.getMonsterSpaceLeft() > 0:
                     try:
                         if self.bot.shop_interval_list[901002]['remained_time'] <= 0:
-                            self.bot.log('{}'.format(self.bot.shop_interval_list[901002]['remained_time']))
+                            # self.bot.log('{}'.format(self.bot.shop_interval_list[901002]['remained_time']))
                             if self.bot.wizard_info['honor_point'] >= self.bot.shop_item_list[901002]['buy_cost'][0]:
                                 pos_x = self.bot.buildings[2]['pos_x'] + random.randint(-5, 5)
                                 pos_y = self.bot.buildings[2]['pos_y'] + random.randint(-5, 5)
@@ -1236,9 +1236,9 @@ class Bot:
             return reps
 
     def getNextBestRep(self):
-        self.bot.log('{}'.format(self.bot.helper_list))
+        # self.bot.log('{}'.format(self.bot.helper_list))
         rep_list = self.getRepList()
-        self.bot.log('{}'.format(rep_list))
+        # self.bot.log('{}'.format(rep_list))
         if rep_list:
             try:
                 max_arena_score_index = find(rep_list, 'arena_score',
@@ -1249,7 +1249,7 @@ class Bot:
                                              max([friend['arena_score'] for friend in rep_list]))
             ret = [{'wizard_id': rep_list[max_arena_score_index]['wizard_id'],
                     'unit_id': rep_list[max_arena_score_index]['unit_id']}]
-            self.bot.log('{}'.format(ret))
+            # self.bot.log('{}'.format(ret))
             return ret
         else:
             return []
@@ -1504,7 +1504,7 @@ if __name__ == "__main__":
                 autoplay.bot.log('Prioritizing weekly devilmon before energy buildings.')
             autoplay.openShopSlots()
 
-            autoplay.finishScenario(1)
+            # autoplay.finishScenario(1)
 			
             sleeper = max((autoplay.bot.market_info['update_remained'] - (time.time() - start) +
                            random.randint(1, 15)) / 2, 0)

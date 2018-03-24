@@ -112,7 +112,8 @@ class API(object):
                 self.s.headers.update({'User-Agent': 'SMON_KR/' + str(self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
                 raise Exception()
         self.log('Current app version used: {}'.format(self.app_version))
-        self.log('Header: {}'.format(self.s.headers))
+        if self.debug == 1:
+            self.log('Header: {}'.format(self.s.headers))
         self.infocsv = None
         self.region = 'eu'
         self.c2_location = 'http://summonerswar-%s.com2us.net/api/location_c2.php'
@@ -213,7 +214,7 @@ class API(object):
                     old_data = data
                     data = json.dumps(data, indent=1).replace(' ', '    ').replace(',   ', ',')
                     self._check_request_data(data)
-                if self.debug:
+                if self.debug == 1:
                     self.log('Request: {}'.format(str(data)))
                 data = self.crypter.encrypt_request(data, 2 if '_c2.php' in path else 1)
             ts = int(time.time())
@@ -228,7 +229,7 @@ class API(object):
             rj = json.loads(res)
             ret_val = self._check_ret_code(res, rj)
             # res = json.loads(res)
-            if self.debug:
+            if self.debug == 1:
                 self.log('Response: {}'.format(str(json.dumps(rj, indent=2))))
             time.sleep(0.5)
             return ret_val
@@ -245,7 +246,8 @@ class API(object):
         self.c2_status = locations['server_url_list'][regions.index(self.region)]['status']
         self.c2_version = locations['server_url_list'][regions.index(self.region)]['version']
         self.c2_api = locations['server_url_list'][regions.index(self.region)]['gateway']
-        self.log('{} {} {} {}'.format(self.c2_location, self.c2_status, self.c2_version, self.c2_api))
+        if self.debug == 1:
+            self.log('{} {} {} {}'.format(self.c2_location, self.c2_status, self.c2_version, self.c2_api))
 
     def getServerStatus(self):
         data = {'game_index': self.game_index, 'proto_ver': self.proto_ver, 'channel_uid': self.uid}
@@ -286,7 +288,8 @@ class API(object):
     def GetDailyQuests(self):
         data = self.base_data('GetDailyQuests', 2)
         res = self.call_api(self.c2_api, data)
-        self.log(self.daily_quest_list)
+        if self.debug == 1:
+            self.log(self.daily_quest_list)
         if res:
             self.UpdateDailyQuestById(16, 1)
         return res
@@ -863,12 +866,14 @@ class API(object):
     """
 
     def BuyShopItem(self, item_id, island_id=0, pos_x=0, pos_y=0):
-        self.log('{}'.format(self.shop_interval_list))
+        if self.debug == 1:
+           self.log('{}'.format(self.shop_interval_list))
         data = self.base_data('BuyShopItem', 2)
         extra_data = OrderedDict([('item_id', item_id), ('island_id', island_id), ('pos_x', pos_x),
                                   ('pos_y', pos_y)])
         data.update(extra_data)
-        self.log('{} {} {} {}'.format(item_id, island_id, pos_x, pos_y))
+        if self.debug == 1:
+            self.log('{} {} {} {}'.format(item_id, island_id, pos_x, pos_y))
         return self.call_api(self.c2_api, data)
 
     def ClaimAchievementReward(self, ach_id):
@@ -912,7 +917,8 @@ class API(object):
                                   ('pos_x', pos_x), ('pos_y', pos_y),
                                   ('source_list', source_list)])
         data.update(extra_data)
-        self.log('{} {} {} {} {} {}'.format(target_id, source_list, island_id, pos_x, pos_y, building_id))
+        if self.debug == 1:
+            self.log('{} {} {} {} {} {}'.format(target_id, source_list, island_id, pos_x, pos_y, building_id))
         res = self.call_api(self.c2_api, data)
         if res:
             self.UpdateDailyQuestById(2, 1)
@@ -1025,12 +1031,15 @@ class API(object):
         # self.wizard_info = input_['wizard_info']
         self.wizard_id = input_['wizard_info']['wizard_id']
         # self.defense_unit_list = input_['defense_unit_list']
-        self.log('wizard_id: {}'.format(self.wizard_id))
+        if self.debug == 1:
+            self.log('wizard_id: {}'.format(self.wizard_id))
         # self.pvp_info = input_['pvp_info']
         # self.buildings = list_to_dict(self.user['building_list'], 'building_master_id')
-        self.log('Buildings: {}'.format(self._getBuildings()))
+        if self.debug == 1:
+            self.log('Buildings: {}'.format(self._getBuildings()))
         # self.deco_list = list_to_dict(self.user['deco_list'], 'master_id')
-        self.log('Decos: {}'.format(self._getDecoList()))
+        if self.debug == 1:
+            self.log('Decos: {}'.format(self._getDecoList()))
         # self.scenario_list = input_['scenario_list']
         # self.unit_list = list_to_dict(input_['unit_list'], 'unit_id')
         # self.inventory_list = input_['inventory_info']
@@ -1041,8 +1050,9 @@ class API(object):
         # self.shop_interval_list = list_to_dict(input_['shop_info']['interval_list'], 'item_id')
         # self.shop_item_list = list_to_dict(input_['shop_info']['item_list'], 'item_id')
         # self.quest_active = list_to_dict(input_['quest_active'], 'quest_id')
-        self.log('Shop interval: {}'.format(self._getShopIntervalList()))
-        self.log('Shop: {}'.format(self.shop_item_list))
+        if self.debug == 1:
+            self.log('Shop interval: {}'.format(self._getShopIntervalList()))
+            self.log('Shop: {}'.format(self.shop_item_list))
         island_no = 1
         for island in self.island_info:
             if island['open'] == 1 and island['id'] != 100:
@@ -1405,7 +1415,8 @@ class API(object):
                             ('create_if_not_exist', 1)])
         res = self.call_api(self.c2_api, data)
         self._setUser(res)
-        self.log(self._getUserInfo())
+        if self.debug == 1:
+            self.log(self._getUserInfo())
         return res
 
     def login(self):
@@ -1447,7 +1458,8 @@ class API(object):
                             ('create_if_not_exist', 0)])
         res = self.call_api(self.c2_api, data)
         self._setUser(res)
-        self.log(self._getUserInfo())
+        if self.debug == 1:
+            self.log(self._getUserInfo())
         return res
 
     @staticmethod
@@ -1506,7 +1518,8 @@ class API(object):
         helper_list = [] if not helper_list else helper_list
         # unit_id_list.sort()
         # self.log('{} {} {} {}'.format(dungeon_id, stage_id, unit_id_list, helper_list))
-        self.log('{}'.format(helper_list))
+        if self.debug == 1:
+            self.log('{}'.format(helper_list))
         dungeon_start = self.BattleDungeonStart(dungeon_id, stage_id, unit_id_list, helper_list)
         if not dungeon_start:
             self.log('Dungeon: {}, stage: {} not successfully started'.format(dungeon_id, stage_id))
@@ -1642,124 +1655,142 @@ class API(object):
                     stage_list[input_['stage_no']]['cleared'] = input_['cleared']
                     self.scenario_list.append({'region_id': input_['region_id'], 'difficulty': input_['difficulty'],
                                                'cleared': 0, 'stage_list': stage_list})
-                self.log(self._getScenarioList())
+                if self.debug == 1:
+                    self.log(self._getScenarioList())
             except KeyError:
                 self.log('Error logging scenario_info')
                 self.log(json.loads(res))
         if isIn('reward_info', res):
             try:
-                self.log(self._getQuestActive())
-                self.log(self._get_quest_rewarded())
-                self.log(json.loads(res)['reward_info']['quest_id'])
+                if self.debug == 1:
+                    self.log(self._getQuestActive())
+                    self.log(self._get_quest_rewarded())
+                    self.log(json.loads(res)['reward_info']['quest_id'])
                 self.quest_active.pop(json.loads(res)['reward_info']['quest_id'])
                 self.quest_rewarded.append(json.loads(res)['reward_info']['quest_id'])
-                self.log(self._getQuestActive())
-                self.log(self._get_quest_rewarded())
+                if self.debug == 1:
+                    self.log(self._getQuestActive())
+                    self.log(self._get_quest_rewarded())
             except KeyError:
                 self.log('Error logging reward_info')
                 self.log(json.loads(res))
         if isIn('unit_lock_list', res):
             try:
                 self._update_unit_lock_list(json.loads(res)['unit_lock_list'])
-                self.log(self._get_unit_lock_list())
+                if self.debug == 1:
+                    self.log(self._get_unit_lock_list())
             except KeyError:
                 self.log('Error logging unit_lock_list')
                 self.log(json.loads(res))
         if isIn('quest_rewarded', res):
             try:
                 self._update_quest_rewarded(json.loads(res)['quest_rewarded'])
-                self.log(self._get_quest_rewarded())
+                if self.debug == 1:
+                    self.log(self._get_quest_rewarded())
             except KeyError:
                 self.log('Error logging quest_rewarded')
                 self.log(json.loads(res))
         if isIn('obstacle_list', res):
             try:
                 self._update_obstacle_list(json.loads(res)['obstacle_list'])
-                self.log(self._get_obstacle_list())
+                if self.debug == 1:
+                    self.log(self._get_obstacle_list())
             except KeyError:
                 self.log('Error logging obstacle_list')
                 self.log(json.loads(res))
         if isIn('obstacle_info', res):
             try:
                 self._update_obstacle_list(json.loads(res)['obstacle_info'])
-                self.log(self._get_obstacle_list())
+                if self.debug == 1:
+                    self.log(self._get_obstacle_list())
             except KeyError:
                 self.log('Error logging obstacle_info')
                 self.log(json.loads(res))
         if isIn('wizard_info', res):
             try:
                 self._updateWizard(json.loads(res)['wizard_info'])
-                self.log(self._getUserInfo())
+                if self.debug == 1:
+                    self.log(self._getUserInfo())
             except KeyError:
                 self.log('Error logging wizard_info')
                 self.log(json.loads(res))
         if isIn('ts_val', res):
             try:
                 self._update_ts_val(json.loads(res)['ts_val'])
-                self.log(self._get_ts_val())
+                if self.debug == 1:
+                    self.log(self._get_ts_val())
             except KeyError:
                 self.log('Error logging ts_val')
                 self.log(json.loads(res))
         if isIn('worldboss_status', res):
             try:
                 self._update_worldboss_status(json.loads(res)['worldboss_status'])
-                self.log(self._get_worldboss_status())
+                if self.debug == 1:
+                    self.log(self._get_worldboss_status())
             except KeyError:
                 self.log('Error logging worldboss_status')
                 self.log(json.loads(res))
         if isIn('npc_list', res):
             try:
                 self._updateNpcList(json.loads(res)['npc_list'])
-                self.log(self._getNpcList())
+                if self.debug == 1:
+                    self.log(self._getNpcList())
             except KeyError:
                 self.log('Error logging npc_list')
                 self.log(json.loads(res))
         if isIn('wish_list', res):
             try:
                 self._updateWishInfo(json.loads(res)['wish_list'])
-                self.log(self._getWishInfo())
+                if self.debug == 1:
+                    self.log(self._getWishInfo())
             except KeyError:
                 self.log('Error logging wish_list')
                 self.log(json.loads(res))
         if isIn('guild', res):
             try:
                 self._updateGuild(json.loads(res)['guild'])
-                self.log(self._getGuild())
+                if self.debug == 1:
+                    self.log(self._getGuild())
             except KeyError:
                 self.log('Error logging guild')
                 self.log(json.loads(res))
         if isIn('worldboss_used_unit', res):
             try:
                 self._update_worldboss_used_unit(json.loads(res)['worldboss_used_unit'])
-                self.log(self._get_worldboss_used_unit())
+                if self.debug == 1:
+                    self.log(self._get_worldboss_used_unit())
             except KeyError:
                 self.log('Error logging worldboss_used_unit')
                 self.log(json.loads(res))
         if isIn('defense_unit_list', res):
             try:
                 self._updateDefenseUnitList(json.loads(res)['defense_unit_list'])
-                self.log(self._getDefenseUnitList())
+                if self.debug == 1:
+                    self.log(self._getDefenseUnitList())
             except KeyError:
                 self.log('Error logging defense_unit_list')
                 self.log(json.loads(res))
         if isIn('trial_tower_list', res):
             try:
                 self._updateTrialTowerList(json.loads(res)['trial_tower_list'])
-                self.log(self._getTrialTowerList())
+                if self.debug == 1:
+                    self.log(self._getTrialTowerList())
             except KeyError:
                 self.log('Error logging trial_tower_list')
                 self.log(json.loads(res))
         if isIn('shop_interval_info', res):
             try:
                 self._updateShopIntervalList(json.loads(res)['shop_interval_info'])
-                self.log(self._getShopIntervalList())
+                if self.debug == 1:
+                    self.log(self._getShopIntervalList())
             except KeyError:
                 self.log('Error logging shop_interval_info')
                 self.log(json.loads(res))
         if isIn('interval_list', res):
             try:
                 self._updateShopIntervalList(json.loads(res)['shop_info']['interval_list'])
-                self.log(self._getShopIntervalList())
+                if self.debug == 1:
+                    self.log(self._getShopIntervalList())
             except KeyError:
                 self.log('Error logging interval_list')
                 self.log(json.loads(res))
@@ -1767,49 +1798,56 @@ class API(object):
         if isIn('target_unit', res):
             try:
                 self._update_unit_list(json.loads(res)['target_unit'])
-                self.log(self._getUnitList())
+                if self.debug == 1:
+                    self.log(self._getUnitList())
             except KeyError:
                 self.log('Error logging target_unit')
                 self.log(json.loads(res))
         if isIn('deco_info', res):
             try:
                 self._update_deco_list(json.loads(res)['deco_info'])
-                self.log(self._getDecoList())
+                if self.debug == 1:
+                    self.log(self._getDecoList())
             except KeyError:
                 self.log('Error logging deco_info')
                 self.log(json.loads(res))
         if isIn('building_info', res):
             try:
                 self._updateBuildings(json.loads(res)['building_info'])
-                self.log(self._getBuildings())
+                if self.debug == 1:
+                    self.log(self._getBuildings())
             except KeyError:
                 self.log('Error logging building_info')
                 self.log(json.loads(res))
         if isIn('deco_list', res):
             try:
                 self._update_deco_list(json.loads(res)['deco_list'])
-                self.log(self._getDecoList())
+                if self.debug == 1:
+                    self.log(self._getDecoList())
             except KeyError:
                 self.log('Error logging deco_list')
                 self.log(json.loads(res))
         if isIn('quest_active', res):
             try:
                 self._updateQuestActive(json.loads(res)['quest_active'])
-                self.log(self._getQuestActive())
+                if self.debug == 1:
+                    self.log(self._getQuestActive())
             except KeyError:
                 self.log('Error logging quest_active')
                 self.log(json.loads(res))
         if isIn('item_list', res):
             try:
                 self._updateShopItemList(json.loads(res)['shop_info']['item_list'])
-                self.log(self._get_shop_item_list())
+                if self.debug == 1:
+                    self.log(self._get_shop_item_list())
             except KeyError:
                 self.log('Error logging item_list')
                 self.log(json.loads(res))
         if isIn('achievement_list', res):
             try:
                 self._updateQuestActive(json.loads(res)['achievement_list'])
-                self.log(self._getQuestActive())
+                if self.debug == 1:
+                    self.log(self._getQuestActive())
             except KeyError:
                 self.log('Error logging achievement_list')
                 self.log(json.loads(res))
@@ -1818,91 +1856,104 @@ class API(object):
                 try:
                     self._update_unit_list(json.loads(res)['unit_info'])
                     self._parseUnitListRunes([json.loads(res)['unit_info']])
-                    self.log(self._getUnitList())
+                    if self.debug == 1:
+                        self.log(self._getUnitList())
                 except KeyError:
                     self.log('Error logging unit_info')
                     self.log(json.loads(res))
         if isIn('arena_list', res):
             try:
                 self._updateArenaList(json.loads(res)['arena_list'])
-                self.log(self._getArenaList())
+                if self.debug == 1:
+                    self.log(self._getArenaList())
             except KeyError:
                 self.log('Error logging arena_list')
                 self.log(json.loads(res))
         if isIn('arena_log', res):
             try:
                 self._updateArenaLog(json.loads(res)['arena_log'])
-                self.log(self._getArenaLog())
+                if self.debug == 1:
+                    self.log(self._getArenaLog())
             except KeyError:
                 self.log('Error logging arena_log')
                 self.log(json.loads(res))
         if isIn('building_list', res):
             try:
                 self._updateBuildings(json.loads(res)['building_list'])
-                self.log(self._getBuildings())
+                if self.debug == 1:
+                    self.log(self._getBuildings())
             except KeyError:
                 self.log('Error logging building_list')
                 self.log(json.loads(res))
         if isIn('market_list', res):
             try:
                 self._updateMarketList(json.loads(res)['market_list'])
-                self.log(self._getMarketList())
+                if self.debug == 1:
+                    self.log(self._getMarketList())
             except KeyError:
                 self.log('Error logging market_list')
                 self.log(json.loads(res))
         if isIn('unit_depository_slots', res):
             try:
                 self._updateUnitDepositorySlots(json.loads(res)['unit_depository_slots'])
-                self.log(self._getUnitDepositorySlots())
+                if self.debug == 1:
+                    self.log(self._getUnitDepositorySlots())
             except KeyError:
                 self.log('Error logging unit_depository_slots')
                 self.log(json.loads(res))
         if isIn('market_info', res):
             try:
                 self._updateMarketInfo(json.loads(res)['market_info'])
-                self.log(self._getMarketInfo())
+                if self.debug == 1:
+                    self.log(self._getMarketInfo())
             except KeyError:
                 self.log('Error logging market_info')
                 self.log(json.loads(res))
         if isIn('mail_list', res):
             try:
                 self._updateMailList(json.loads(res)['mail_list'])
-                self.log(self._getMailList())
+                if self.debug == 1:
+                    self.log(self._getMailList())
             except KeyError:
                 self.log('Error logging mail_list')
                 self.log(json.loads(res))
         if isIn('wish_info', res):
             try:
                 self._updateWishInfo(json.loads(res)['wish_info'])
-                self.log(self._getWishInfo())
+                if self.debug == 1:
+                    self.log(self._getWishInfo())
             except KeyError:
                 self.log('Error logging wish_info')
                 self.log(json.loads(res))
         if isIn('scenario_list', res):
             try:
                 self._update_scenario_list(json.loads(res)['scenario_list'])
-                self.log(self._getScenarioList())
+                if self.debug == 1:
+                    self.log(self._getScenarioList())
             except KeyError:
                 self.log('Error logging scenario_list')
                 self.log(json.loads(res))
         if isIn('dungeon_list', res) and not isIn('GetEventTimeTable', res):
             try:
                 self._update_dungeon_list(json.loads(res)['dungeon_list'])
-                self.log(self._getDungeonList())
+                if self.debug == 1:
+                    self.log(self._getDungeonList())
             except KeyError:
                 self.log('Error logging dungeon_list')
                 self.log(json.loads(res))
         if isIn('unit_list', res):
             try:
                 self._update_unit_list(json.loads(res)['unit_list'])
-                self.log(self._getUnitList())
+                if self.debug == 1:
+                    self.log(self._getUnitList())
             except KeyError:
                 self.log('Error logging unit_list')
                 self.log(json.loads(res))
         if isIn('rune', res):
             try:
                 self._updateRune(json.loads(res)['reward']['crate']['rune'])
-                self.log(self._getRuneList())
+                if self.debug == 1:
+                    self.log(self._getRuneList())
             except KeyError:
                 try:
                     self._updateRune(json.loads(res)['rune'])
@@ -1913,42 +1964,48 @@ class API(object):
         if isIn('inventory_info', res):
             try:
                 self._updateInventoryList(json.loads(res)['inventory_info'])
-                self.log(self._getInventoryList())
+                if self.debug == 1:
+                    self.log(self._getInventoryList())
             except KeyError:
                 self.log('Error logging inventory_info')
                 self.log(json.loads(res))
         if isIn('quest_info', res):
             try:
                 self._updateDailyQuestList([json.loads(res)['quest_info']])
-                self.log(self._getDailyQuestList())
+                if self.debug == 1:
+                    self.log(self._getDailyQuestList())
             except KeyError:
                 self.log('Error logging quest_info')
                 self.log(json.loads(res))
         if isIn('quest_list', res):
             try:
                 self._updateDailyQuestList(json.loads(res)['quest_list'])
-                self.log(self._getDailyQuestList())
+                if self.debug == 1:
+                    self.log(self._getDailyQuestList())
             except KeyError:
                 self.log('Error logging quest_list')
                 self.log(json.loads(res))
         if isIn('friend_list', res):
             try:
                 self._updateFriendList(json.loads(res)['friend_list'])
-                self.log(self._getFriendList())
+                if self.debug == 1:
+                    self.log(self._getFriendList())
             except KeyError:
                 self.log('Error logging friend_list')
                 self.log(json.loads(res))
         if isIn('helper_list', res):
             try:
                 self._updateHelperList(json.loads(res)['helper_list'])
-                self.log('Helpers: {}'.format(self._getHelperList()))
+                if self.debug == 1:
+                    self.log('Helpers: {}'.format(self._getHelperList()))
             except KeyError:
                 self.log('Error logging helper_list')
                 self.log(json.loads(res))
         if isIn('gifted_list', res):
             try:
                 self._updateGiftedFriends(json.loads(res)['gifted_list'])
-                self.log(self._getFriendList())
+                if self.debug == 1:
+                    self.log(self._getFriendList())
             except KeyError:
                 self.log('Error logging gifted_list')
                 self.log(json.loads(res))
@@ -1970,14 +2027,16 @@ class API(object):
         if isIn('daily_reward_info', res):
             try:
                 self._update_daily_reward_info(json.loads(res)['daily_reward_info'])
-                self.log(self._getDailyRewardInfo())
+                if self.debug == 1:
+                    self.log(self._getDailyRewardInfo())
             except KeyError:
                 self.log('Error logging daily_reward_info')
                 self.log(json.loads(res))
         if isIn('pvp_info', res):
             try:
                 self._updatePvpInfo(json.loads(res)['pvp_info'])
-                self.log(self._getPvpInfo())
+                if self.debug == 1:
+                    self.log(self._getPvpInfo())
             except KeyError:
                 self.log('Error logging pvp_info')
                 self.log(json.loads(res))
@@ -1989,21 +2048,24 @@ class API(object):
                 self.log('ret_code: {}'.format(rj['ret_code']))
                 self.log('')
                 return None
-            self.log('ret_code: {} command: {}'.format(rj['ret_code'], rj['command']))
+            if self.debug == 1:
+                self.log('ret_code: {} command: {}'.format(rj['ret_code'], rj['command']))
         return rj
 
     def _check_request_data(self, data):
         if isIn('UpgradeUnit', data) or isIn('SacrificeUnit', data):
             try:
                 self._remove_unit(json.loads(data)['source_list'])
-                self.log(self._getUnitList())
+                if self.debug == 1:
+                    self.log(self._getUnitList())
             except KeyError:
                 self.log('Error removing unit sacrifized or used for upgrade.')
                 self.log(json.loads(data))
         if isIn('rune_id_list', data):
             try:
                 self._removeRune(json.loads(data)['rune_id_list'])
-                self.log(self._getRuneList())
+                if self.debug == 1:
+                    self.log(self._getRuneList())
             except KeyError:
                 self.log('Error removing rune')
                 self.log(json.loads(data))
