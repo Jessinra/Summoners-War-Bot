@@ -42,8 +42,8 @@ class API(object):
         # if 'Admin-PC' == socket.gethostname():
         #     self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.game_index = 2624
-        self.proto_ver = 11090
-        self.app_version = '3.8.1'
+        self.proto_ver = 11100
+        self.app_version = '3.8.2'
         net_version = self.app_version.split('.')
         net_version_str = ''.join(net_version)
         net_version_str = ''.join([net_version_str, '0' * (5 - len(net_version_str))])
@@ -72,8 +72,8 @@ class API(object):
                     return
             net_version = version.split('.')
             given_version = self.app_version.split('.')
-            self.binary_size = 27615018
-            self.binary_check = 'b40bded83decb70f421b7536beb909d8'
+            self.binary_size = 27614074
+            self.binary_check = '04de50bd683dd1d66d2ce310c9134e77'
             print(self.binary_check, self.binary_size)
             sess_ver.close()
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
