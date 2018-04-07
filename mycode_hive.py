@@ -12,6 +12,7 @@ device_id = ''
 device = ''
 
 try:
+    data = None
     with open('config.json', 'r') as f:
         data = json.load(f)
         if data.get('device_id'):
