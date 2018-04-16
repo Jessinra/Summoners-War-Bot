@@ -42,8 +42,8 @@ class API(object):
         # if 'Admin-PC' == socket.gethostname():
         #     self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.game_index = 2624
-        self.proto_ver = 11101
-        self.app_version = '3.8.3'
+        self.proto_ver = 11110
+        self.app_version = '3.8.4'
         net_version = self.app_version.split('.')
         net_version_str = ''.join(net_version)
         net_version_str = ''.join([net_version_str, '0' * (5 - len(net_version_str))])
@@ -72,8 +72,8 @@ class API(object):
                     return
             net_version = version.split('.')
             given_version = self.app_version.split('.')
-            self.binary_size = 27614510
-            self.binary_check = '5611774fca9942e75189e8716e2910fc'
+            self.binary_size = 27644794
+            self.binary_check = '7aa488349e9df6782af4cc50481f920a'
             print(self.binary_check, self.binary_size)
             sess_ver.close()
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
@@ -1647,17 +1647,23 @@ class API(object):
                 region_list = [{'i': i, 'region': region} for i, region in enumerate(self.scenario_list) if region['region_id'] == input_['region_id'] and region['difficulty'] == input_['difficulty']]
                 if region_list:
                     for region in region_list:
-                        self.scenario_list[region['i']]['stage_list'][input_['stage_no']-1]['cleared'] = input_['cleared']
+                        try:
+                            self.scenario_list[region['i']]['stage_list'][input_['stage_no']-1]['cleared'] = input_['cleared']
+                        except IndexError:
+                            self.scenario_list[region['i']]['stage_list'].append({'stage_no': input_['stage_no'], 'cleared': input_['cleared']})
                         if input_['stage_no'] == 7 and input_['cleared'] == 1:
-                            self.scenario_list[region['i']]['cleared'] = 1
+                                self.scenario_list[region['i']]['cleared'] = 1
                 else:
                     stage_list = [{'stage_no': i, 'cleared': 0} for i in range(1, 8)]
-                    stage_list[input_['stage_no']]['cleared'] = input_['cleared']
+                    stage_list[input_['stage_no']-1]['cleared'] = input_['cleared']
                     self.scenario_list.append({'region_id': input_['region_id'], 'difficulty': input_['difficulty'],
                                                'cleared': 0, 'stage_list': stage_list})
                 if self.debug == 1:
                     self.log(self._getScenarioList())
             except KeyError:
+                self.log('Error logging scenario_info')
+                self.log(json.loads(res))
+            except IndexError:
                 self.log('Error logging scenario_info')
                 self.log(json.loads(res))
         if isIn('reward_info', res):
