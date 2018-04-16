@@ -32,7 +32,7 @@ class Activeuser():
         self.mode = AES.MODE_CBC
         self.s = requests.session()
         self.s.verify = False
-        self.s.headers.update({'Content-Type': 'text/html', 'Accept-Language': 'en-gb', 'User-Agent':'SMON_Kr/3.8.3.38300 CFNetwork/808.2.16 Darwin/16.3.0'})
+        self.s.headers.update({'Content-Type': 'text/html', 'Accept-Language': 'en-gb', 'User-Agent':'SMON_Kr/3.8.4.38400 CFNetwork/808.2.16 Darwin/16.3.0'})
 
     def get_ts(self):
         return str(int(time.time()))
@@ -74,7 +74,7 @@ class QPYOU(object):
         if 'Admin-PC' == socket.gethostname():
             self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.s.headers.update({'Content-Type': 'application/json', 'Accept-Language': 'en-gb',
-                               'User-Agent': 'SMON_Kr/3.8.3.38300 CFNetwork/808.2.16 Darwin/16.3.0'})
+                               'User-Agent': 'SMON_Kr/3.8.4.38400 CFNetwork/808.2.16 Darwin/16.3.0'})
         self.did = did
         self.guest_uid = None
         self.p1 = '{"hive_country":"EN","device_country":"EN","timezone":null,"language":"en","game_language":"en",' \
@@ -113,7 +113,7 @@ class QPYOU(object):
             ad_id = 'xxx'
             device = 'xxx'
             appid = 'com.com2us.smon.normal.freefull.google.kr.android.common'
-            native_ver = 'Hive+v.2.6.5'
+            native_ver = 'Hive+v.2.6.6'
             osversion = 'xxx'
             platform = 'android'
             user_agent = 'xxx'
@@ -122,7 +122,7 @@ class QPYOU(object):
             ad_id = rndDeviceId()
             device = 'SM-G955F'
             appid = 'com.com2us.smon.normal.freefull.google.kr.android.common'
-            native_ver = 'Hive+v.2.6.5'
+            native_ver = 'Hive+v.2.6.6'
             osversion = '7.0'
             platform = 'android'
             user_agent = 'Mozilla/5.0 (Linux; Android 7.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, ' \
@@ -157,7 +157,7 @@ class QPYOU(object):
         self.s.cookies.update(
             {'advertising_id': rndDeviceId(), 'appid': 'com.com2us.smon.normal.freefull.google.kr.android.common',
              'device': 'SM-G955F', 'did': str(random.randint(200000000, 300000000)) if not self.did else str(self.did),
-             'native_version': 'Hive+v.2.6.5', 'osversion': '7.0', 'platform': 'android',
+             'native_version': 'Hive+v.2.6.6', 'osversion': '7.0', 'platform': 'android',
              'vendor_id': rndDeviceId()})
         self.registered()
         res = self.create()
