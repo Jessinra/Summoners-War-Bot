@@ -32,7 +32,11 @@ class Activeuser():
         self.mode = AES.MODE_CBC
         self.s = requests.session()
         self.s.verify = False
+<<<<<<< HEAD
         self.s.headers.update({'Content-Type': 'text/html', 'Accept-Language': 'en-gb', 'User-Agent':'SMON_Kr/3.8.5.38500 CFNetwork/808.2.16 Darwin/16.3.0'})
+=======
+        self.s.headers.update({'Content-Type': 'text/html', 'Accept-Language': 'en-gb', 'User-Agent':'SMON_Kr/3.8.4.38400 CFNetwork/808.2.16 Darwin/16.3.0'})
+>>>>>>> 8691396be2731c1da7f86cc484e47ac90198be60
 
     def get_ts(self):
         return str(int(time.time()))
@@ -74,7 +78,11 @@ class QPYOU(object):
         if 'Admin-PC' == socket.gethostname():
             self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.s.headers.update({'Content-Type': 'application/json', 'Accept-Language': 'en-gb',
+<<<<<<< HEAD
                                'User-Agent': 'SMON_Kr/3.8.5.38500 CFNetwork/808.2.16 Darwin/16.3.0'})
+=======
+                               'User-Agent': 'SMON_Kr/3.8.4.38400 CFNetwork/808.2.16 Darwin/16.3.0'})
+>>>>>>> 8691396be2731c1da7f86cc484e47ac90198be60
         self.did = did
         self.guest_uid = None
         self.p1 = '{"hive_country":"EN","device_country":"EN","timezone":null,"language":"en","game_language":"en",' \
