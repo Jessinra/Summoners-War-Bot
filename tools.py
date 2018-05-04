@@ -40,6 +40,10 @@ def gen_random_ip():
     return socket.inet_ntoa(struct.pack('>I', random.randint(1, 0xffffffff)))
 
 
+def gen_clear_time(clear_time):
+    return int(clear_time * 1000)
+
+
 def find(lst, key, value):
     for i, dic in enumerate(lst):
         if dic[key] == value:
@@ -266,4 +270,3 @@ def get_monster_names_by_id():
 def get_monster_name_by_id(monster_id):
     with open('monsters.json') as f:
         return json.loads(f.read())[str(monster_id)]
-

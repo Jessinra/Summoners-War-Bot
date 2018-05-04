@@ -13,7 +13,7 @@ from api import API
 from mapping import inventory_type_map, buy_type_map, summon_source_map, experience_level_up_map, \
     summon_type_map, decoration_upgrade_cost, max_class_level_map, market_upgrade_cost_map, element_map, scenario_id_map
 from qpyou import QPYOU
-from tools import find, get_monster_name_by_id
+from tools import find, get_monster_name_by_id, gen_clear_time
 
 
 class Bot:
@@ -568,7 +568,7 @@ class Bot:
         helper_used = 0
         # do giants dungeon
         if not self.bot.daily_quest_list[9]['completed'] == 1:
-            clear_time = random.randint(60, 120)
+            clear_time = gen_clear_time(random.uniform(60, 120))
             helper = self.getNextBestRep()
             self.bot.doDungeon(8001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
             helper_used += 1
@@ -585,7 +585,7 @@ class Bot:
                 and 10 in list(self.bot.daily_quest_list.keys()):
             # do monday elemental dungeon
             if not self.bot.daily_quest_list[10]['completed'] == 1:
-                clear_time = random.randint(60, 120)
+                clear_time = gen_clear_time(random.uniform(60, 120))
                 helper = self.getNextBestRep()
                 self.bot.doDungeon(1001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                 helper_used += 1
@@ -603,7 +603,7 @@ class Bot:
                 and 11 in list(self.bot.daily_quest_list.keys()):
             # do tuesday elemental dungeon
             if not self.bot.daily_quest_list[11]['completed'] == 1:
-                clear_time = random.randint(60, 120)
+                clear_time = gen_clear_time(random.uniform(60, 120))
                 helper = self.getNextBestRep()
                 self.bot.doDungeon(2001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                 helper_used += 1
@@ -621,7 +621,7 @@ class Bot:
                 and 12 in list(self.bot.daily_quest_list.keys()):
             # do wednesday elemental dungeon
             if not self.bot.daily_quest_list[12]['completed'] == 1:
-                clear_time = random.randint(60, 120)
+                clear_time = gen_clear_time(random.uniform(60, 120))
                 helper = self.getNextBestRep()
                 self.bot.doDungeon(3001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                 helper_used += 1
@@ -639,7 +639,7 @@ class Bot:
                 and 13 in list(self.bot.daily_quest_list.keys()):
             # do thursday elemental dungeon
             if not self.bot.daily_quest_list[13]['completed'] == 1:
-                clear_time = random.randint(60, 120)
+                clear_time = gen_clear_time(random.uniform(60, 120))
                 helper = self.getNextBestRep()
                 self.bot.doDungeon(4001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                 helper_used += 1
@@ -657,7 +657,7 @@ class Bot:
                 and 15 in list(self.bot.daily_quest_list.keys()):
             # do sunday elemental dungeon
             if not self.bot.daily_quest_list[15]['completed'] == 1:
-                clear_time = random.randint(60, 120)
+                clear_time = gen_clear_time(random.uniform(60, 120))
                 helper = self.getNextBestRep()
                 self.bot.doDungeon(7001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                 helper_used += 1
@@ -676,7 +676,7 @@ class Bot:
             # do magic dungeon
             if not self.bot.daily_quest_list[14]['completed'] == 1:
                 while helper_used < 3:
-                    clear_time = random.randint(60, 120)
+                    clear_time = gen_clear_time(random.uniform(60, 120))
                     helper = self.getNextBestRep()
                     self.bot.doDungeon(5001, 1, clear_time, units=None, helper_list=helper, win_lose=1)
                     helper_used += 1
@@ -692,7 +692,7 @@ class Bot:
         # do energy quest
         if not self.bot.daily_quest_list[1]['completed'] == 1:
             while not self.bot.daily_quest_list[1]['completed'] == 1:
-                clear_time = random.randint(30, 90)
+                clear_time = gen_clear_time(random.uniform(30, 90))
                 self.bot.do_scenario(3, 7, 1, clear_time, units=None, helper_list=None, win_lose=1)
             if self.bot.daily_quest_list[1]['completed'] == 1:
                 self.bot.log('Successfully finished energy quest. Now collecting reward.')
@@ -775,7 +775,7 @@ class Bot:
             for unit in self.bot.defense_unit_list[:-1]:
                 unit_id_list.append({'unit_id': unit['unit_id']})
             while not self.bot.daily_quest_list[7]['completed'] == 1:
-                clear_time = random.randint(30, 90)
+                clear_time = gen_clear_time(random.uniform(30, 90))
                 helper = self.getNextBestRep()
                 if helper:
                     self.bot.do_scenario(3, 7, 1, clear_time, units=unit_id_list, helper_list=helper, win_lose=1)
@@ -984,7 +984,7 @@ class Bot:
             stage_no_cleared = max([stage['stage_no'] for stage in info_['stage_list'] if stage['cleared'] == 1])
             while stage_no_cleared < 7:
                 stage_no_cleared += 1
-                clear_time = random.randint(20, 40)
+                clear_time = gen_clear_time(random.uniform(20, 40))
                 if not self.bot.do_scenario(scenario, stage_no_cleared, difficulty, clear_time):
                     return False
                 region_key = scenario_id_map[scenario][difficulty]
@@ -1006,7 +1006,7 @@ class Bot:
                 time.sleep(5)
         for scenario in scenarios_not_started:
             for stage_no in range(1, 8):
-                clear_time = random.randint(20, 40)
+                clear_time = gen_clear_time(random.uniform(20, 40))
                 if not self.bot.do_scenario(scenario, stage_no, difficulty, clear_time):
                     return False
                 region_key = scenario_id_map[scenario][difficulty]
