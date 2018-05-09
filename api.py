@@ -1525,7 +1525,7 @@ class API(object):
             self.log('Dungeon: {}, stage: {} not successfully started'.format(dungeon_id, stage_id))
             return
         battley_key, opp_unit_status_list = API.parseBattleStart(dungeon_start, win_lose)
-        time.sleep(clear_time)
+        time.sleep(int(clear_time/1000))
         dungeon_end = self.BattleDungeonResult(battley_key, dungeon_id, stage_id, unit_id_list, opp_unit_status_list,
                                                clear_time, win_lose)
         self.parseBattleResult(dungeon_end)
@@ -1565,7 +1565,7 @@ class API(object):
             self.log('Battle not successfully started.')
             return
         battle_key, opp_unit_status_list = API.parseBattleStart(battle_start, win_lose)
-        time.sleep(clear_time)
+        time.sleep(int(clear_time/1000))
         battle_end = self.BattleTrialTowerResult_v2(battle_key, difficulty, floor_id, win_lose, unit_id_list, opp_unit_status_list)
         self.parseBattleResult(battle_end)
         time.sleep(3)
@@ -1612,7 +1612,7 @@ class API(object):
         res = API.parseBattleStart(battle_start, win_lose)
         self.log('Battle started: region {}, stage {}, difficulty {}'.format(region_id, stage_no, difficulty))
         unit_result_list = [{'unit_id': unit['unit_id'], 'pos_id': i + 1} for i, unit in enumerate(unit_id_list)]
-        time.sleep(clear_time)
+        time.sleep(int(clear_time/1000))
         # self.log('{} {} {} {} {} {}'.format(res[0], res[1], unit_id_list,
         #                                        {"island_id": self.last_position['island_id'],
         #                                         "pos_x": self.last_position['pos_x'],
