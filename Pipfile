@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pillow = "*"
+"bs4" = "*"
+requests = "*"
+"urllib3" = "*"
+pycryptodome = "*"
+googletrans = "*"
+bitstring = "*"
+
+[dev-packages]
+"flake8" = "*"
+pylint = "*"
+"autopep8" = "*"
+
+[requires]
+python_version = "3.6"
