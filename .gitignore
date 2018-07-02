@@ -7,3 +7,4 @@ decode.py
 .vscode
 test.py
 venv
+settings.json
