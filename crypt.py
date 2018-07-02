@@ -10,7 +10,10 @@ BS = 16
 
 
 def pad(s):
-    return s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+    try:
+        return s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+    except TypeError:
+        return s + ((BS - len(s) % BS) * chr(BS - len(s) % BS)).encode()
 
 
 class Crypter(object):
@@ -100,12 +103,12 @@ class Crypter(object):
         return ((0x5A92AD2B + (
                     (((self.EG_knlCurrentUpTime(ts) - 0xE86C29C) >> 3) * 0x20C49BA5E353F7CF >> 64) >> 4)) ^ 0x1C2F0688)
 
-    def _decrypt_aes128(self, s, key):
-        e = AES.new(key, self.mode, '\x00'*16)
+    def decrypt_aes128(self, s, key):
+        e = AES.new(key, self.mode, b'\x00'*16)
         return self.encoder.decode(e.decrypt(base64.b64decode(s)))
 
-    def _encrypt_aes128(self, s, key):
-        e = AES.new(key, self.mode, '\x00' * 16)
+    def encrypt_aes128(self, s, key):
+        e = AES.new(key, self.mode, b'\x00' * 16)
         return self.encoder.decode(e.encrypt(s))
 
     def _decrypt(self, msg, version=1):
@@ -148,7 +151,10 @@ class Crypter(object):
             raise ValueError('Unknown key version')
         obj = AES.new(bytes(key, 'utf-8'), AES.MODE_CBC,
                       b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-        return obj.encrypt(pad(msg).encode())
+        try:
+            return obj.encrypt(pad(msg).encode())
+        except AttributeError:
+            return obj.encrypt(pad(msg))
 
     def decrypt_request(self, msg, version=1):
         return self._decrypt(base64.b64decode(msg), version)
@@ -161,6 +167,10 @@ class Crypter(object):
 
     def encrypt_request(self, msg, version=1):
         return base64.b64encode(self._encrypt(msg, version))
+
+    def encrypt_response(self, msg, version=1):
+        zlib_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS)
+        return base64.b64encode(self._encrypt(zlib_compress.compress(msg) + zlib_compress.flush(), version)).decode()
 
     def decrypt_dat_file(self, file):
         with open(file) as f:

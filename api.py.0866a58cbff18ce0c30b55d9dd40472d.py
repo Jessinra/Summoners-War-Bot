@@ -8,6 +8,8 @@ import time
 from collections import OrderedDict
 from random import randint
 import ast
+import random
+import socket
 import threading
 from fake_useragent import UserAgent
 import requests
@@ -29,8 +31,7 @@ class API(object):
         self.logger.setLevel(logging.INFO)
         self.fh = logging.FileHandler('log.log', 'w', encoding='utf-8')
         self.fh.setLevel(logging.INFO)
-        self.formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
         self.debug = debug
@@ -40,16 +41,13 @@ class API(object):
 
         # if 'Admin-PC' == socket.gethostname():
         #     self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
-
-        self.game_index = 2624
-        self.proto_ver = 11150
-        self.app_version = '3.8.8'
+        self.game_index = 2623
+        self.proto_ver = 11130
+        self.app_version = '3.8.6'
         net_version = self.app_version.split('.')
         net_version_str = ''.join(net_version)
-        net_version_str = ''.join(
-            [net_version_str, '0' * (5 - len(net_version_str))])
-        self.s.headers.update({'User-Agent': ''.join(['SMON_KR/', str(
-            self.app_version), '.', net_version_str, ' CFNetwork/808.2.16 Darwin/16.3.0'])})
+        net_version_str = ''.join([net_version_str, '0' * (5 - len(net_version_str))])
+        self.s.headers.update({'User-Agent': ''.join(['Summoners%20War/', str(self.app_version), '.', net_version_str, ' CFNetwork/808.2.16 Darwin/16.3.0'])})
         if app_id and 'android' in str(app_id):
             sess_ver = requests.Session()
             ua = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'
@@ -74,30 +72,25 @@ class API(object):
                     return
             net_version = version.split('.')
             given_version = self.app_version.split('.')
-            self.binary_size = 28737464
-            self.binary_check = 'e4d414019ee3fe5d03d51cf3bff09c99'
+            self.binary_size = 28218642
+            self.binary_check = '8ee0ea5e44a97d8949b9b8989594a953'
             print(self.binary_check, self.binary_size)
             sess_ver.close()
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
                                                             for i in range(len(net_version))]):
                 self.app_version = version
                 self.log('New app version found: {}'.format(version))
-                self.log(
-                    'For security reasons bot tries to download new android apk.')
+                self.log('For security reasons bot tries to download new android apk.')
                 net_version_str = ''.join(net_version)
-                net_version_str = net_version_str + \
-                    '0' * (5 - len(net_version_str))
-                self.s.headers.update({'User-Agent': 'SMON_KR/' + str(
-                    self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
+                net_version_str = net_version_str + '0' * (5 - len(net_version_str))
+                self.s.headers.update({'User-Agent': 'SMON_KR/' + str(self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
                 try:
                     self.binary_check, self.binary_size = checkAndroidApk()
-                    self.log('MD5: {}, binary_size: {}'.format(
-                        self.binary_check, self.binary_size))
+                    self.log('MD5: {}, binary_size: {}'.format(self.binary_check, self.binary_size))
                 except ConnectionError:
                     return
         elif app_id and 'ios' in str(app_id):
-            version_req = requests.get(
-                'https://itunes.apple.com/de/app/summoners-war-sky-arena/id852912420').text
+            version_req = requests.get('https://itunes.apple.com/de/app/summoners-war-sky-arena/id852912420').text
             soup = BeautifulSoup(version_req, "html.parser")
             version = None
             while not version:
@@ -115,10 +108,8 @@ class API(object):
                 self.log('New app version found: {}'.format(version))
                 self.log('For security reasons bot stopped.')
                 net_version_str = ''.join(net_version)
-                net_version_str = net_version_str + \
-                    '0' * (5 - len(net_version_str))
-                self.s.headers.update({'User-Agent': 'SMON_KR/' + str(
-                    self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
+                net_version_str = net_version_str + '0' * (5 - len(net_version_str))
+                self.s.headers.update({'User-Agent': 'SMON_KR/' + str(self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
                 raise Exception()
         self.log('Current app version used: {}'.format(self.app_version))
         if self.debug == 1:
@@ -199,8 +190,7 @@ class API(object):
         hub = ?
         '''
         if region not in regions:
-            self.log('invalid region, choose one from these: {}'.format(
-                ','.join(regions)))
+            self.log('invalid region, choose one from these: {}'.format(','.join(regions)))
             # exit(1)
             self.region = random.choice(regions)
         self.region = region
@@ -210,8 +200,7 @@ class API(object):
         self.idfa = id_
 
     def log(self, msg):
-        time_str = time.strftime('%H:%M:%S')
-        print(f'[{time_str}]: {msg}')
+        print('[{}]: {}'.format(time.strftime('%H:%M:%S'), msg))
         try:
             self.logger.info(str(msg))
         except AttributeError:
@@ -223,22 +212,18 @@ class API(object):
             if not repeat:
                 if type(data) != str:
                     old_data = data
-                    data = json.dumps(data, indent=1).replace(
-                        ' ', '    ').replace(',   ', ',')
+                    data = json.dumps(data, indent=1).replace(' ', '    ').replace(',   ', ',')
                     self._check_request_data(data)
                 if self.debug == 1:
                     self.log('Request: {}'.format(str(data)))
-                data = self.crypter.encrypt_request(
-                    data, 2 if '_c2.php' in path else 1)
+                data = self.crypter.encrypt_request(data, 2 if '_c2.php' in path else 1)
             ts = int(time.time())
             # print(str(self.crypter.get_player_server_connect_elapsed_time(ts)))
             try:
-                res = self.s.post(path, data, headers={'SmonTmVal': str(old_data['ts_val']) if old_data else str(
-                    self.crypter.get_player_server_connect_elapsed_time(ts)), 'SmonChecker': self.crypter.get_smon_checker(data, ts)})
+                res = self.s.post(path, data, headers={'SmonTmVal': str(old_data['ts_val']) if old_data else str(self.crypter.get_player_server_connect_elapsed_time(ts)), 'SmonChecker': self.crypter.get_smon_checker(data, ts)})
             except KeyError:
                 return self.call_api(path, data, True)
-            res = self.crypter.decrypt_response(
-                res.content, 2 if '_c2.php' in path else 1)
+            res = self.crypter.decrypt_response(res.content, 2 if '_c2.php' in path else 1)
             self._check_response_data(res)
 
             rj = json.loads(res)
@@ -265,13 +250,11 @@ class API(object):
             self.log('{} {} {} {}'.format(self.c2_location, self.c2_status, self.c2_version, self.c2_api))
 
     def getServerStatus(self):
-        data = {'game_index': self.game_index,
-                'proto_ver': self.proto_ver, 'channel_uid': self.uid}
+        data = {'game_index': self.game_index, 'proto_ver': self.proto_ver, 'channel_uid': self.uid}
         return self.call_api(self.c2_status, data)
 
     def getVersionInfo(self):
-        data = {'game_index': self.game_index,
-                'proto_ver': self.proto_ver, 'channel_uid': self.uid}
+        data = {'game_index': self.game_index, 'proto_ver': self.proto_ver, 'channel_uid': self.uid}
         res = self.call_api(self.c2_version, data)
         self.parseVersionData(res['version_data'])
         return res
@@ -293,8 +276,7 @@ class API(object):
         elif kind == 2:
             # ts_val = int(round(self.ts_val + time.time() - self.session_start, 0))
             data = OrderedDict([('command', cmd), ('wizard_id', self.wizard_id), ('session_key', self.getUID()),
-                                ('proto_ver', self.uid), ('infocsv',
-                                                          self.infocsv), ('channel_uid', self.uid),
+                                ('proto_ver', self.uid), ('infocsv', self.infocsv), ('channel_uid', self.uid),
                                 ('ts_val', self.crypter.get_player_server_connect_elapsed_time())])
         return data
 
@@ -437,22 +419,19 @@ class API(object):
 
     def OpenBlackMarketSlot(self):
         data = self.base_data('OpenBlackMarketSlot', 2)
-        extra_data = OrderedDict(
-            [('building_id', self.buildings[11]['building_id'])])
+        extra_data = OrderedDict([('building_id', self.buildings[11]['building_id'])])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
     def AcceptFriendRequest(self, req_wizard_id, req_wizard_name=''):
-        self.log('Accepting friend request from: {}'.format(
-            req_wizard_name if req_wizard_name else req_wizard_id))
+        self.log('Accepting friend request from: {}'.format(req_wizard_name if req_wizard_name else req_wizard_id))
         data = self.base_data('AcceptFriendRequest', 2)
         extra_data = OrderedDict([('req_wizard_id', req_wizard_id)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
     def AddFriendRequestByUid(self, uid, add_wizard_name=''):
-        self.log('Sending friend request to: {}'.format(
-            add_wizard_name if add_wizard_name else uid))
+        self.log('Sending friend request to: {}'.format(add_wizard_name if add_wizard_name else uid))
         data = self.base_data('AddFriendRequestByUid', 2)
         extra_data = OrderedDict([('uid', uid)])
         data.update(extra_data)
@@ -488,8 +467,7 @@ class API(object):
     def GetArenaWizardList(self, refresh=0, cash_used=0):
         self.log('Get enemies in arena.')
         data = self.base_data('GetArenaWizardList', 2)
-        extra_data = OrderedDict(
-            [('refresh', refresh), ('cash_used', int(cash_used))])
+        extra_data = OrderedDict([('refresh', refresh), ('cash_used', int(cash_used))])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
@@ -504,8 +482,7 @@ class API(object):
         self.log('Buying item {} from magic shop'.format(item_no))
         data = self.base_data('BuyBlackMarketItem', 2)
         extra_data = OrderedDict([('building_id', self.buildings[11]['building_id']), ('item_no', int(item_no)),
-                                  ('item_master_type', int(item_master_type)
-                                   ), ('item_master_id', int(item_master_id)),
+                                  ('item_master_type', int(item_master_type)), ('item_master_id', int(item_master_id)),
                                   ('amount', int(amount))])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
@@ -513,8 +490,7 @@ class API(object):
     def BuyInappProduct(self, product_id, product_price, currency, signature, receipt_data):
         data = self.base_data('BuyInappProduct', 2)
         extra_data = OrderedDict([('game_index', self.game_index), ('product_id', product_id),
-                                  ('product_price',
-                                   product_price), ('currency', currency),
+                                  ('product_price', product_price), ('currency', currency),
                                   ('signature', signature), ('receipt_data', receipt_data)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
@@ -533,8 +509,7 @@ class API(object):
 
     def GetEventTimeTable(self):
         data = self.base_data('GetEventTimeTable', 2)
-        extra_data = OrderedDict(
-            [('lang', 1), ('app_version', self.app_version)])
+        extra_data = OrderedDict([('lang', 1), ('app_version', self.app_version)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
@@ -568,8 +543,8 @@ class API(object):
     10414 = fusioniere undine wasser
     10415 = fusioniere vampir wind
     10416 = fusioniere ifrit
-
-
+    
+    
     EVENT ID: 70011
     10606 = toa stage 30 -> do_toa(stage=30)
     10607 = toa stage 50 -> do_toa(stage=50)
@@ -577,7 +552,7 @@ class API(object):
     10609 = toa stage 100
     10610 = toah stage 70
     10611 = toah stage 100
-
+    
     10612 = raid betreten
     10613 = raid clearen
     10618 = rang a in riss dungeon
@@ -589,15 +564,14 @@ class API(object):
     10621 = homunkulus beschwören
     10617 = riss raid 5 clearen
     10622 = alle riss dungeons mit s oder höher
-
+    
     10601 = Etage 7 Dragons ohne Hilfe
     10602 = Etage 10 Dragons ohne Hilfe
     10603 = Etage 7 Dragons ohne Hilfe ohne Kristalle zu hitten
     10604 = Etage 7 Necro ohne Hilfe
     10605 = Necro 10 ohne Hilfe
-
+    
     """
-
     def UpdateAchievement(self, ach_list):
         data = self.base_data('UpdateAchievement', 2)
         extra_data = OrderedDict([('ach_list', ach_list)])
@@ -622,8 +596,7 @@ class API(object):
                                 activate_list.append(False)
                         else:
                             activate_list.append(False)
-                quests_to_activate.append(
-                    {'quest_id': int(achievement['quest id'])})
+                quests_to_activate.append({'quest_id': int(achievement['quest id'])})
         if quests_to_activate:
             self.ActivateQuests(quests_to_activate)
 
@@ -642,18 +615,18 @@ class API(object):
     10412 nach 10406, 10407, 10408
     10413, 10414, 10415 nach 10412
     10416 nach 10413, 10414, 10415
-
+    
     10602 nach 10601
     10603 nach 10602
     10604 nach 10603
     10605 nach 10604
-
+    
     10607 nach 10606
     10608 nach 10607
     10609 nach 10608
     10610 nach 10609
     10611 nach 10610
-
+    
     10613, 10618 nach 10612
     10614 nach 10613
     10615 nach 10614
@@ -664,7 +637,6 @@ class API(object):
     10621 nach 10620
     10622 nach 10621
     """
-
     def ActivateQuests(self, quests):
         data = self.base_data('ActivateQuests', 2)
         extra_data = OrderedDict([('quests', quests)])
@@ -679,8 +651,7 @@ class API(object):
 
     def createMentoring(self, target_wizard_id):
         data = self.base_data('createMentoring', 2)
-        extra_data = OrderedDict(
-            [('target_wizard_id', target_wizard_id), ('type', 1), ('ignore_attend', 0)])
+        extra_data = OrderedDict([('target_wizard_id', target_wizard_id), ('type', 1), ('ignore_attend', 0)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
@@ -720,8 +691,7 @@ class API(object):
 
     def BattleArenaStart(self, opp_wizard_id, unit_id_list, log_id=None):
         data = self.base_data('BattleArenaStart', 2)
-        extra_data = OrderedDict(
-            [('opp_wizard_id', opp_wizard_id), ('unit_id_list', unit_id_list), ('retry', 0)])
+        extra_data = OrderedDict([('opp_wizard_id', opp_wizard_id), ('unit_id_list', unit_id_list), ('retry', 0)])
         data.update(extra_data)
         if log_id:
             log_data = OrderedDict([('log_id', log_id)])
@@ -746,8 +716,7 @@ class API(object):
     def BattleArenaResult(self, battle_key, opp_unit_status_list, unit_id_list, win_lose):
         data = self.base_data('BattleArenaResult', 2)
         extra_data = OrderedDict([('battle_key', battle_key), ('win_lose', win_lose),
-                                  ('opp_unit_status_list',
-                                   opp_unit_status_list), ('unit_id_list', unit_id_list),
+                                  ('opp_unit_status_list', opp_unit_status_list), ('unit_id_list', unit_id_list),
                                   ('retry', 0)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
@@ -756,8 +725,7 @@ class API(object):
         helper_list = [helper_list[0]] if len(helper_list) >= 1 else []
         data = self.base_data('BattleScenarioStart', 2)
         extra_data = OrderedDict([('region_id', region_id), ('stage_no', stage_no), ('difficulty', difficulty),
-                                  ('unit_id_list',
-                                   unit_id_list), ('helper_list', helper_list),
+                                  ('unit_id_list', unit_id_list), ('helper_list', helper_list),
                                   ('mentor_helper_list', '[]'),
                                   ('npc_friend_helper_list', '[]'), ('retry', '0')])
         data.update(extra_data)
@@ -778,8 +746,7 @@ class API(object):
         helper_list = [helper_list[0]] if len(helper_list) >= 1 else []
         data = self.base_data('BattleDungeonStart', 2)
         extra_data = OrderedDict([('dungeon_id', dungeon_id), ('stage_id', stage_id), ('helper_list', helper_list),
-                                  ('mentor_helper_list', []
-                                   ), ('npc_friend_helper_list', []),
+                                  ('mentor_helper_list', []), ('npc_friend_helper_list', []),
                                   ('unit_id_list', unit_id_list),
                                   ('cash_used', 0), ('retry', '0')])
         data.update(extra_data)
@@ -815,10 +782,8 @@ class API(object):
         data = self.base_data('BattleTrialTowerResult_v2', 2)
         extra_data = OrderedDict(
             [('battle_key', battle_key), ('difficulty', difficulty), ('floor_id', floor_id), ('win_lose', win_lose),
-             ('unit_id_list', unit_id_list), ('opp_unit_status_list',
-                                              opp_unit_status_list),
-             ('island_id', self.last_position['island_id']
-              ), ('pos_x', self.last_position['pos_x']),
+             ('unit_id_list', unit_id_list), ('opp_unit_status_list', opp_unit_status_list),
+             ('island_id', self.last_position['island_id']), ('pos_x', self.last_position['pos_x']),
              ('pos_y', self.last_position['pos_y']), ('retry', 0)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
@@ -826,8 +791,7 @@ class API(object):
     def BattleScenarioResult(self, battle_key, opp_unit_status_list, unit_id_list, position, clear_time, win_lose):
         data = self.base_data('BattleScenarioResult', 2)
         extra_data = OrderedDict([('battle_key', battle_key), ('win_lose', win_lose),
-                                  ('opp_unit_status_list',
-                                   opp_unit_status_list), ('unit_id_list', unit_id_list),
+                                  ('opp_unit_status_list', opp_unit_status_list), ('unit_id_list', unit_id_list),
                                   ('position', position),
                                   ('clear_time', clear_time), ('retry', 0)])
         data.update(extra_data)
@@ -839,8 +803,7 @@ class API(object):
         extra_data = OrderedDict([('battle_key', battle_key), ('dungeon_id', dungeon_id), ('stage_id', stage_id),
                                   ('win_lose', win_lose), ('unit_id_list', unit_id_list),
                                   ('opp_unit_status_list', opp_unit_status_list),
-                                  ('island_id',
-                                   self.last_position['island_id']),
+                                  ('island_id', self.last_position['island_id']),
                                   ('pos_x', self.last_position['pos_x']),
                                   ('pos_y', self.last_position['pos_y']), ('clear_time', clear_time), ('retry', 0)])
         data.update(extra_data)
@@ -853,10 +816,8 @@ class API(object):
         data = self.base_data('SummonUnit', 2)
         extra_data = OrderedDict([('building_id', self.buildings[2]['building_id']), ('mode', mode),
                                   ('pos_arr', [OrderedDict([('island_id', self.buildings[2]['island_id']),
-                                                            ('pos_x',
-                                                             self.buildings[2]['pos_x']),
-                                                            ('pos_y',
-                                                             self.buildings[2]['pos_y']),
+                                                            ('pos_x', self.buildings[2]['pos_x']),
+                                                            ('pos_y', self.buildings[2]['pos_y']),
                                                             ('unit_master_id', 0)])])])
         data.update(extra_data)
         res = self.call_api(self.c2_api, data)
@@ -875,8 +836,7 @@ class API(object):
 
     def EquipRuneList(self, rune_id_list, unit_id):
         data = self.base_data('EquipRuneList', 2)
-        extra_data = OrderedDict(
-            [('rune_id_list', rune_id_list), ('unit_id', unit_id)])
+        extra_data = OrderedDict([('rune_id_list', rune_id_list), ('unit_id', unit_id)])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
 
@@ -973,16 +933,14 @@ class API(object):
         try:
             if not self.daily_quest_list[quest_id]['completed']:
                 progress = self.daily_quest_list[quest_id]['progressed'] + increment
-                self.UpdateDailyQuest(
-                    [{'quest_id': quest_id, 'progressed': progress}])
+                self.UpdateDailyQuest([{'quest_id': quest_id, 'progressed': progress}])
         except KeyError:
             self.log('Error updating quest: {}'.format(quest_id))
 
     def ReceiveMail(self, mail_id_list):
         data = self.base_data('ReceiveMail', 2)
         extra_data = OrderedDict([('mail_id_list', mail_id_list),
-                                  ('island_id',
-                                   self.last_position['island_id']),
+                                  ('island_id', self.last_position['island_id']),
                                   ('pos_x', self.last_position['pos_x']),
                                   ('pos_y', self.last_position['pos_y'])])
         data.update(extra_data)
@@ -995,10 +953,8 @@ class API(object):
     def DoRandomWishItem(self, crystal_refresh=False):
         data = self.base_data('DoRandomWishItem', 2)
         extra_data = OrderedDict([('island_id', self.buildings[10]['island_id']),
-                                  ('building_id',
-                                   self.buildings[10]['building_id']),
-                                  ('pos_x', self.buildings[10]['pos_x']), (
-                                      'pos_y', self.buildings[10]['pos_y']),
+                                  ('building_id', self.buildings[10]['building_id']),
+                                  ('pos_x', self.buildings[10]['pos_x']), ('pos_y', self.buildings[10]['pos_y']),
                                   ('cash_used', int(crystal_refresh))])
         data.update(extra_data)
         return self.call_api(self.c2_api, data)
@@ -1037,8 +993,7 @@ class API(object):
         ended = time.time()
         battle_key = battle_start['tvalue'] + ended - started
         self.BattleRiftOfWorldsRaidStart(battle_key)
-        clear_time = random.uniform(180, 260)
-        time.sleep(clear_time/1000)
+        clear_time = random.randint(180, 260)
 
     def GetWorldBossStatus(self, worldboss_id):
         data = self.base_data('GetWorldBossStatus', 2)
@@ -1114,8 +1069,7 @@ class API(object):
             index_found = find(decorations, 'deco master id', str(deco_))
             for x in range(int(decorations[index_found]['width'])):
                 for y in range(int(decorations[index_found]['height'])):
-                    self.island_list.update_occupation(
-                        item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
+                    self.island_list.update_occupation(item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
 
     def occupy_islands_buildings(self):
         with open('buildings.json', 'r', encoding='utf-8') as build:
@@ -1124,19 +1078,16 @@ class API(object):
             index_found = find(buildings, 'building master id', str(build_))
             for x in range(int(buildings[index_found]['width'])):
                 for y in range(int(buildings[index_found]['height'])):
-                    self.island_list.update_occupation(
-                        item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
+                    self.island_list.update_occupation(item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
 
     def occupy_islands_obstacles(self):
         with open('obstacles.json', 'r', encoding='utf-8') as obs:
             obstacles = json.load(obs)
         for obs_, item in self.obstacle_list.items():
-            index_found = find(
-                obstacles, 'obstacle master id', str(item['master_id']))
+            index_found = find(obstacles, 'obstacle master id', str(item['master_id']))
             for x in range(int(obstacles[index_found]['width'])):
                 for y in range(int(obstacles[index_found]['height'])):
-                    self.island_list.update_occupation(
-                        item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
+                    self.island_list.update_occupation(item['island_id'], item['pos_x'] + x, item['pos_y'] + y, 1)
 
     def _updateWizard(self, input_):
         self.wizard_info = input_
@@ -1149,8 +1100,7 @@ class API(object):
 
     def _update_obstacle_list(self, input_):
         try:
-            self.obstacle_list = updateDict(
-                self.obstacle_list, input_, 'obstacle_id')
+            self.obstacle_list = updateDict(self.obstacle_list, input_, 'obstacle_id')
         except AttributeError:
             self.obstacle_list = updateDict(None, input_, 'obstacle_id')
         self.occupy_islands_obstacles()
@@ -1164,8 +1114,7 @@ class API(object):
 
     def _update_worldboss_status(self, input_):
         try:
-            self.worldboss_status = updateDict(
-                self.worldboss_status, input_, 'worldboss_id')
+            self.worldboss_status = updateDict(self.worldboss_status, input_, 'worldboss_id')
         except AttributeError:
             self.worldboss_status = updateDict(None, input_, 'worldboss_id')
 
@@ -1180,22 +1129,19 @@ class API(object):
 
     def _updateTrialTowerList(self, input_):
         try:
-            self.trial_tower_list = updateDict(
-                self.trial_tower_list, input_, 'difficulty')
+            self.trial_tower_list = updateDict(self.trial_tower_list, input_, 'difficulty')
         except AttributeError:
             self.trial_tower_list = updateDict(None, input_, 'difficulty')
 
     def _updateShopIntervalList(self, input_):
         try:
-            self.shop_interval_list = updateDict(
-                self.shop_interval_list, input_, 'item_id')
+            self.shop_interval_list = updateDict(self.shop_interval_list, input_, 'item_id')
         except AttributeError:
             self.shop_interval_list = updateDict(None, input_, 'item_id')
 
     def _updateShopItemList(self, input_):
         try:
-            self.shop_item_list = updateDict(
-                self.shop_item_list, input_, 'item_id')
+            self.shop_item_list = updateDict(self.shop_item_list, input_, 'item_id')
         except AttributeError:
             self.shop_item_list = updateDict(None, input_, 'item_id')
             # print(input_)
@@ -1208,8 +1154,7 @@ class API(object):
 
     def _updateQuestActive(self, input_):
         try:
-            self.quest_active = updateDict(
-                self.quest_active, input_, 'quest_id')
+            self.quest_active = updateDict(self.quest_active, input_, 'quest_id')
         except AttributeError:
             self.quest_active = updateDict(None, input_, 'quest_id')
 
@@ -1252,8 +1197,7 @@ class API(object):
 
     def _updateBuildings(self, input_):
         try:
-            self.buildings = updateDict(
-                self.buildings, input_, 'building_master_id')
+            self.buildings = updateDict(self.buildings, input_, 'building_master_id')
         except AttributeError:
             self.buildings = updateDict(None, input_, 'building_master_id')
         self.occupy_islands_buildings()
@@ -1269,15 +1213,13 @@ class API(object):
 
     def _updateGiftedFriends(self, input_):
         try:
-            self.friend_list = updateDict(
-                self.friend_list, input_, 'wizard_id')
+            self.friend_list = updateDict(self.friend_list, input_, 'wizard_id')
         except AttributeError:
             self.friend_list = updateDict(None, input_, 'wizard_id')
 
     def _updateDailyQuestList(self, input_):
         try:
-            self.daily_quest_list = updateDict(
-                self.daily_quest_list, input_, 'quest_id')
+            self.daily_quest_list = updateDict(self.daily_quest_list, input_, 'quest_id')
         except AttributeError:
             self.daily_quest_list = updateDict(None, input_, 'quest_id')
 
@@ -1463,18 +1405,13 @@ class API(object):
 
     def GuestLogin(self):
         data = OrderedDict([('command', 'GuestLogin'), ('game_index', self.game_index), ('proto_ver', self.proto_ver),
-                            ('app_version', self.app_version), ('infocsv',
-                                                                self.infocsv), ('uid', self.uid),
-                            ('channel_uid', self.uid), ('did',
-                                                        self.did), ('push', 1), ('is_emulator', 0),
-                            ('country', 'DE'), ('lang', 'eng'), ('lang_game',
-                                                                 1), ('mac_address', '02:00:00:00:00:00'),
+                            ('app_version', self.app_version), ('infocsv', self.infocsv), ('uid', self.uid),
+                            ('channel_uid', self.uid), ('did', self.did), ('push', 1), ('is_emulator', 0),
+                            ('country', 'DE'), ('lang', 'eng'), ('lang_game', 1), ('mac_address', '02:00:00:00:00:00'),
                             ('device_name', 'iPhone10,6'), ('os_version', '11.1'),
                             ('token', '0000000000000000000000000000000000000000000000000000000000000000'),
-                            ('idfv', self.idfa), ('adid',
-                                                  '00000000-0000-0000-0000-000000000000'),
-                            ('binary_size', 10448304), ('binary_check',
-                                                        '87c2986b797cfdf61e5816809395ad8d'),
+                            ('idfv', self.idfa), ('adid', '00000000-0000-0000-0000-000000000000'),
+                            ('binary_size', 10448304), ('binary_check', '87c2986b797cfdf61e5816809395ad8d'),
                             ('create_if_not_exist', 1)])
         res = self.call_api(self.c2_api, data)
         self._setUser(res)
@@ -1487,7 +1424,8 @@ class API(object):
         status = self.getServerStatus()['maintenace']
         while status == 1:
             wait_time = random.randint(250, 350)
-            self.log('Server {} undergoing maintenance right now, waiting for {} seconds.'.format(self.region, wait_time))
+            self.log('Server {} undergoing maintenance right now, waiting for {} seconds.'.format(self.region,
+                                                                                                      wait_time))
             time.sleep(wait_time)
             status = self.getServerStatus()['maintenace']
         self.getVersionInfo()
@@ -1516,8 +1454,7 @@ class API(object):
                             ('lang', 'eng'), ('lang_game', 1), ('mac_address', mac),
                             ('device_name', device_name), ('os_version', os_version),
                             ('token', token), ('idfv', ''), ('adid', ''),
-                            ('binary_size', self.binary_size), ('binary_check',
-                                                                self.binary_check),
+                            ('binary_size', self.binary_size), ('binary_check', self.binary_check),
                             ('create_if_not_exist', 0)])
         res = self.call_api(self.c2_api, data)
         self._setUser(res)
@@ -1560,8 +1497,7 @@ class API(object):
                     alive_unit['result'] = 1
                 return battle_key, opp_unit_status_list
             elif 'opp_unit_list' in list(input_.keys()) and 'pvp_info' in list(input_.keys()):
-                opp_unit_status_list = [
-                    {'unit_id': item['unit_info']['unit_id'], 'result': 2} for item in input_['opp_unit_list']]
+                opp_unit_status_list = [{'unit_id': item['unit_info']['unit_id'], 'result': 2} for item in input_['opp_unit_list']]
                 opp_unit_status_list[-1]['result'] = 1
                 return battle_key, opp_unit_status_list
             elif 'trial_tower_unit_list' in list(input_.keys()):
@@ -1575,8 +1511,7 @@ class API(object):
 
     def doDungeon(self, dungeon_id, stage_id, clear_time, units=None, helper_list=None, win_lose=1):
         if dungeon_id not in [dungeon['dungeon_id'] for dungeon in self.dungeon_list]:
-            self.log(
-                'Dungeon {} does not exist or isn\'t available today.'.format(dungeon_id))
+            self.log('Dungeon {} does not exist or isn\'t available today.'.format(dungeon_id))
             return
         unit_id_list = [{'unit_id': unit['unit_id']} for unit in
                         self.defense_unit_list] if not units else units
@@ -1587,8 +1522,7 @@ class API(object):
             self.log('{}'.format(helper_list))
         dungeon_start = self.BattleDungeonStart(dungeon_id, stage_id, unit_id_list, helper_list)
         if not dungeon_start:
-            self.log('Dungeon: {}, stage: {} not successfully started'.format(
-                dungeon_id, stage_id))
+            self.log('Dungeon: {}, stage: {} not successfully started'.format(dungeon_id, stage_id))
             return
         battley_key, opp_unit_status_list = API.parseBattleStart(dungeon_start, win_lose)
         time.sleep(int(clear_time/1000))
@@ -1625,10 +1559,8 @@ class API(object):
         if 100 >= floor_id > self.trial_tower_list[difficulty]['cleared'] + 1:
             self.log('Invalid floor id {} for toa.'.format(floor_id))
             return
-        unit_id_list = [{'unit_id': unit['unit_id']}
-                        for unit in self.defense_unit_list] if not units else units
-        battle_start = self.BattleTrialTowerStart_v2(
-            difficulty, floor_id, unit_id_list)
+        unit_id_list = [{'unit_id': unit['unit_id']} for unit in self.defense_unit_list] if not units else units
+        battle_start = self.BattleTrialTowerStart_v2(difficulty, floor_id, unit_id_list)
         if not battle_start:
             self.log('Battle not successfully started.')
             return
@@ -1663,20 +1595,17 @@ class API(object):
             self.log('Not able to skip levels.')
             return False
 
-        scenario_id = str(region_id) + '0' + \
-            str(difficulty) + '0' + str(stage_no)
+        scenario_id = str(region_id) + '0' + str(difficulty) + '0' + str(stage_no)
 
         if self.wizard_info['wizard_energy'] < int(scenarios[find(scenarios, 'scenario id', scenario_id)]['energy cost']):
             self.log('Not enough energy.')
             return False
 
-        unit_id_list = [{'unit_id': unit['unit_id']}
-                        for unit in self.defense_unit_list] if not units else units
+        unit_id_list = [{'unit_id': unit['unit_id']} for unit in self.defense_unit_list] if not units else units
         helper_list = [] if not helper_list else helper_list
         # unit_id_list.sort()
         # self.log('{} {} {} {} {}'.format(region_id, stage_no, difficulty, unit_id_list, helper_list))
-        battle_start = self.BattleScenarioStart(
-            region_id, stage_no, difficulty, unit_id_list, helper_list)
+        battle_start = self.BattleScenarioStart(region_id, stage_no, difficulty, unit_id_list, helper_list)
         if not battle_start:
             self.log('Battle not successfully started.')
             return False
@@ -1715,8 +1644,7 @@ class API(object):
         if isIn('scenario_info', res):
             try:
                 input_ = json.loads(res)['scenario_info']
-                region_list = [{'i': i, 'region': region} for i, region in enumerate(self.scenario_list) if region['region_id'] == input_[
-                    'region_id'] and region['difficulty'] == input_['difficulty']]
+                region_list = [{'i': i, 'region': region} for i, region in enumerate(self.scenario_list) if region['region_id'] == input_['region_id'] and region['difficulty'] == input_['difficulty']]
                 if region_list:
                     for region in region_list:
                         try:
@@ -2126,7 +2054,6 @@ class API(object):
                 self.log('ret_code: {}'.format(rj['ret_code']))
                 self.log('')
                 return None
-
             if self.debug == 1:
                 self.log('ret_code: {} command: {}'.format(rj['ret_code'], rj['command']))
         return rj

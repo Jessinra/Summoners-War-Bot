@@ -15,10 +15,26 @@ from mapping import inventory_type_map, buy_type_map, summon_source_map, experie
 from qpyou import QPYOU
 from tools import find, get_monster_name_by_id, gen_clear_time
 
-
-
 class Bot:
     def __init__(self, user_='', user_mail_='', pw_='', device_id_='', device_=None, region_='eu'):
+        if not device_id_:
+            try:
+                with open('config.json', 'r') as f:
+                    data = json.load(f)
+                    if data.get('device_id'):
+                        device_id_ = data.get('device_id')
+                    else:
+                        device_id_ = str(random.randint(200000000, 300000000))
+                        data.update({'device_id': device_id})
+                with open('config.json', 'w') as f:
+                    f.write(json.dumps(data))
+            except FileNotFoundError:
+                with open('config.json', 'w') as f:
+                    device_id_ = str(random.randint(200000000, 300000000))
+                    data = {
+                        'device_id': device_id_
+                    }
+                    f.write(json.dumps(data))
         self.uid, self.did, self.sessionkey, appID = QPYOU(device_id_, device_).hiveLogin(user_, pw_)
         self.bot = API(self.uid, self.did, user_, user_mail_, self.sessionkey, device_, appID)
         self.bot.set_region(region_)
@@ -118,8 +134,8 @@ class Bot:
             return pos_x, pos_y
 
     def buyWeeklyGuildRainbowmon(self):
-        self.bot.log(self.bot.shop_interval_list)
-        self.bot.log(self.bot.shop_item_list)
+        # self.bot.log(self.bot.shop_interval_list)
+        # self.bot.log(self.bot.shop_item_list)
         try:
             if self.bot.shop_interval_list[1200005]['remained_time'] <= 0:
                 if self.getMonsterSpaceLeft() > 0:
@@ -171,14 +187,14 @@ class Bot:
             return
 
     def buyWeeklyDevilmon(self):
-        self.bot.log(self.bot.shop_interval_list)
-        self.bot.log(self.bot.shop_item_list)
+        # self.bot.log(self.bot.shop_interval_list)
+        # self.bot.log(self.bot.shop_item_list)
         try:
             if self.bot.shop_interval_list[901002]['remained_time'] <= 0:
                 if self.getMonsterSpaceLeft() > 0:
                     try:
                         if self.bot.shop_interval_list[901002]['remained_time'] <= 0:
-                            self.bot.log('{}'.format(self.bot.shop_interval_list[901002]['remained_time']))
+                            # self.bot.log('{}'.format(self.bot.shop_interval_list[901002]['remained_time']))
                             if self.bot.wizard_info['honor_point'] >= self.bot.shop_item_list[901002]['buy_cost'][0]:
                                 pos_x = self.bot.buildings[2]['pos_x'] + random.randint(-5, 5)
                                 pos_y = self.bot.buildings[2]['pos_y'] + random.randint(-5, 5)
@@ -473,9 +489,12 @@ class Bot:
                 break
 
     def doDailyWish(self):
-        wish_outcome = self.bot.DoRandomWishItem()['wish_info']
-        self.bot.log('Wish granted {} with amount of {}'.format(inventory_type_map[wish_outcome['item_master_type']],
-                                                                wish_outcome['amount']))
+        if 10 in self.bot.buildings:
+            wish_outcome = self.bot.DoRandomWishItem()['wish_info']
+            self.bot.log('Wish granted {} with amount of {}'.format(inventory_type_map[wish_outcome['item_master_type']],
+                                                                    wish_outcome['amount']))
+        else:
+            self.bot.log('Temple of wishes not built yet')
 
     def collectAllMail(self):
         # collects all mails, but not social points
@@ -1006,7 +1025,7 @@ class Bot:
                                         [{'ach_id': quest_id, 'cond_id': condition_[0], 'current': condition_[2] + 1}])
 
                 time.sleep(5)
-		self.bot.level8()
+                self.bot.level8()
 
     def moveUnitsFromStorage(self, unit_ids):
         space_left = self.getMonsterSpaceLeft()
@@ -1091,45 +1110,47 @@ class Bot:
 
     def ArenaHandler(self):
         self.bot.GetArenaLog()
-        if time.time() - self.last_arena_refresh > 120:
-            self.last_arena_refresh = time.time()
-            self.bot.GetArenaWizardList(refresh=1)
-        else:
-            self.bot.GetArenaWizardList()
+        if self.bot.pvp_info.get('rating_remained') <= 601200:
+            if time.time() - self.last_arena_refresh > 120:
+                self.last_arena_refresh = time.time()
+                self.bot.GetArenaWizardList(refresh=1)
+            else:
+                self.bot.GetArenaWizardList()
 
-        npc_list = []
-        revenge_list = []
-        arena_fight_list = []
+            npc_list = []
+            revenge_list = []
+            arena_fight_list = []
 
-        for npc, info_ in self.bot.npc_list.items():
-            if info_['next_battle'] <= 0:
-                npc_list.append(npc)
+            for npc, info_ in self.bot.npc_list.items():
+                if info_['next_battle'] <= 0:
+                    npc_list.append(npc)
 
-        for wizard, info_ in self.bot.arena_log.items():
-            if info_['STATUS'] == 0:
+            for wizard, info_ in self.bot.arena_log.items():
+                if info_['STATUS'] == 0:
+                    opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
+                    if info_['opp_arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
+                            or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
+                        revenge_list.append([wizard, info_['log_id']])
+
+            for wizard, info_ in self.bot.arena_list.items():
                 opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
-                if info_['opp_arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
+                if info_['arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
                         or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
-                    revenge_list.append([wizard, info_['log_id']])
+                    arena_fight_list.append(wizard)
 
-        for wizard, info_ in self.bot.arena_list.items():
-            opp_units = self.bot.GetArenaUnitList(wizard)['opp_unit_list']
-            if info_['arena_score'] <= self.getArenaRating() + 100 or len(opp_units) <= 2 \
-                    or max([opp_unit['unit_info']['unit_level'] for opp_unit in opp_units]) <= 30:
-                arena_fight_list.append(wizard)
-
-        return npc_list, revenge_list, arena_fight_list
+            return npc_list, revenge_list, arena_fight_list
+        return [], [], []
 
     def ArenaListNpc(self):
         self.bot.GetArenaWizardList()
+        if self.bot.pvp_info.get('rating_remained') <= 601200:
+            npc_list = []
+            for npc, info_ in self.bot.npc_list.items():
+                if info_['next_battle'] <= 0:
+                    npc_list.append(npc)
 
-        npc_list = []
-
-        for npc, info_ in self.bot.npc_list.items():
-            if info_['next_battle'] <= 0:
-                npc_list.append(npc)
-
-        return npc_list
+            return npc_list
+        return []
 
     def ArenaFighterNpc(self, units=None):
         npc_list = self.ArenaListNpc()
@@ -1214,9 +1235,9 @@ class Bot:
             return reps
 
     def getNextBestRep(self):
-        self.bot.log('{}'.format(self.bot.helper_list))
+        # self.bot.log('{}'.format(self.bot.helper_list))
         rep_list = self.getRepList()
-        self.bot.log('{}'.format(rep_list))
+        # self.bot.log('{}'.format(rep_list))
         if rep_list:
             try:
                 max_arena_score_index = find(rep_list, 'arena_score',
@@ -1227,7 +1248,7 @@ class Bot:
                                              max([friend['arena_score'] for friend in rep_list]))
             ret = [{'wizard_id': rep_list[max_arena_score_index]['wizard_id'],
                     'unit_id': rep_list[max_arena_score_index]['unit_id']}]
-            self.bot.log('{}'.format(ret))
+            # self.bot.log('{}'.format(ret))
             return ret
         else:
             return []
@@ -1324,9 +1345,9 @@ class Bot:
             # print(open_ach)
             try:
                 index = find(achievements, 'quest id', str(open_ach))
-                open_quest_list.append([open_ach, item_['conditions'], achievements[index]['title_en'],
-                                        ast.literal_eval(achievements[index]['conditions']),
-                                        ast.literal_eval(achievements[index]['req id'])])
+                open_quest_list.append([open_ach, item_['conditions'], achievements[index].get('title_en'),
+                                        ast.literal_eval(achievements[index].get('conditions')),
+                                        ast.literal_eval(achievements[index].get('req id'))])
             except ValueError:
                 self.bot.log('Open quest: {} not founrd.'.format(open_ach))
         self.bot.log(open_quest_list)
@@ -1382,7 +1403,7 @@ class Bot:
                 pending_requests = self.bot.GetFriendRequestSend()['friend_req_list']
                 recommended_friends = self.bot.GetFriendRecommended()
                 for recommended_friend in recommended_friends['recommended_list']:
-                    if recommended_friend['wizard_id'] not in [info_['wizard_id'] for
+                    if recommended_friend['wizard_id'] not in [friend for
                                                                friend, info_ in self.bot.friend_list.items()] \
                             and recommended_friend['wizard_id'] not in [pending['wizard_id'] for
                                                                         pending in pending_requests]:
@@ -1431,10 +1452,13 @@ if __name__ == "__main__":
     user = ''
     user_mail = ''
     pw = ''
-    # device id
-    device_id = 'xxx'
+    # device id, leave empty if you don't know yours
+    device_id = ''
+    # device name configurable in api and qpyou, leave empty if you haven't prepared a configuration
+    device = ''
+    # set to your region code ('eu', etc.) find codes in api.py -> set_region
     region = ''
-    autoplay = Bot(user, user_mail, pw, device_id, region)
+    autoplay = Bot(user, user_mail, pw, device_id, device, region)
 	# Items to buy from shop
     item_list = [9, 13]
     while True:
@@ -1479,7 +1503,7 @@ if __name__ == "__main__":
                 autoplay.bot.log('Prioritizing weekly devilmon before energy buildings.')
             autoplay.openShopSlots()
 
-            autoplay.finishScenario(1)
+            # autoplay.finishScenario(1)
 
             sleeper = max((autoplay.bot.market_info['update_remained'] - (time.time() - start) +
                            random.randint(1, 15)) / 2, 0)
