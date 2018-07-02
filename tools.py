@@ -36,6 +36,10 @@ class Pkcs7Encoder:
         return text + binascii.unhexlify(output.getvalue())
 
 
+def gen_clear_time(clear_time):
+    return int(clear_time * 1000)
+
+
 def gen_random_ip():
     return socket.inet_ntoa(struct.pack('>I', random.randint(1, 0xffffffff)))
 
@@ -100,7 +104,8 @@ def downloadAndroidApk():
     if file.status_code == 200:
         meta = file.headers
         file_size = int(meta["Content-Length"])
-        print("Downloading APK package {} with total size of {} bytes.".format(download_l, file_size))
+        print("Downloading APK package {} with total size of {} bytes.".format(
+            download_l, file_size))
         with open('file.apk', 'wb') as f:
             file.raw.decode_content = True
             shutil.copyfileobj(file.raw, f)
@@ -146,7 +151,8 @@ def _get_translation_tables():
 
             for _ in range(table_len):
                 parsed_id, str_len = raw.readlist('intle:32, intle:32')
-                parsed_str = binascii.a2b_hex(raw.read('hex:{}'.format(str_len * 8))[:-4])
+                parsed_str = binascii.a2b_hex(
+                    raw.read('hex:{}'.format(str_len * 8))[:-4])
                 table[parsed_id] = parsed_str.decode("utf-8")
 
             tables.append(table)
@@ -266,4 +272,3 @@ def get_monster_names_by_id():
 def get_monster_name_by_id(monster_id):
     with open('monsters.json') as f:
         return json.loads(f.read())[str(monster_id)]
-

@@ -157,4 +157,3 @@ island_maps = {
         'occupied_coords': [],
     },
 }
-

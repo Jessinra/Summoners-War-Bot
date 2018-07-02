@@ -13,6 +13,8 @@ import io
 import time
 import sys
 import zlib
+import re
+from crypt import Crypter
 
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -27,7 +29,7 @@ def MD5(i):
 
 class Activeuser():
     def __init__(self):
-        self.encoder = pkcs_seven_encoder()
+        self.encoder = Pkcs7Encoder()
         self.mode = AES.MODE_CBC
         self.s = requests.session()
         self.s.verify = False
@@ -72,20 +74,29 @@ class QPYOU(object):
         self.s.verify = False
         if 'Admin-PC' == socket.gethostname():
             self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
-        self.s.headers.update({'Content-Type': 'application/json', 'Accept-Language': 'en-gb',
-                               'User-Agent': 'SMON_Kr/3.7.9.37900 CFNetwork/808.2.16 Darwin/16.3.0'})
+        self.s.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36',
+            'Accept-Language': 'en-gb'})
         self.did = did
         self.guest_uid = None
-        self.p1 = '{"hive_country":"EN","device_country":"EN","timezone":null,"language":"en","game_language":"eng",' \
-                  '"server_id":""}'
+        #self.p1 = '{"hive_country":"EN","device_country":"EN","timezone":null,"language":"en","game_language":"eng",' \
+        #          '"server_id":""}'
+        self.p1 = '{"hive_country":"%s","device_country":"EN","timezone":null,"language":"en","game_language":"en", "server_id":""}'
         # self.p1 = '{"language":"en","timezone":null,"game_language":"en","server_id":"","device_country":"RU",' \
         #           '"hive_country":"RU"} '
         self.p2 = '{"hive_country":"EN","device_country":"EN","guest_uid":"%s","timezone":null,"language":"en",' \
                   '"game_language":"en","server_id":""}'
         self.phone = phone
+        self._crypter = Crypter()
+        self.getCountry()
+
+    def getCountry(self):
+        r = self.s.get('http://summonerswar-eu.com2us.net/api/location_c2.php')
+        self.hive_country = json.loads(self._crypter.decrypt_response(r.content, 2))['country_code']
+        return self.hive_country
 
     def create(self):
-        res = json.loads(self.s.post('https://api.qpyou.cn/guest/create', data=self.p1).content)
+        res = json.loads(self.s.post('https://api.qpyou.cn/guest/create', data=self.p1%(self.hive_country)).content)
         if res['error_code'] == 1401:
             print('ip banned')
             if socket.gethostname() == 'Admin-PC':
@@ -95,17 +106,24 @@ class QPYOU(object):
         return res
 
     def auth(self):
-        return json.loads(self.s.post('https://api.qpyou.cn/guest/auth', data=self.p2 % self.guest_uid).content)
+        return json.loads(self.s.post('https://api.qpyou.cn/guest/auth', data=self.p2%(self.guest_uid)).content)
 
     def registered(self):
-        return json.loads(self.s.post('https://api.qpyou.cn/device/registered', data=self.p1).content)
+        return json.loads(self.s.post('https://api.qpyou.cn/device/registered',data=self.p1%(self.hive_country)).content)
 
     def me(self):
-        res = self.s.post('https://api.qpyou.cn/user/me', data=self.p1)
+        es=self.s2.post('https://api.qpyou.cn/user/me',data=self.p1%(self.hive_country),headers={'Content-Type':'application/json','Accept-Language':'en-gb','User-Agent':'Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)'})
         # print(str(res.content))
         if 'thorization Faile' in str(res.content):
             return None
         return json.loads(res.content)
+
+    def otpVerification(self, udata):
+        if 'ct' not in udata and 'iv' not in udata and '"s"' not in udata and '"d"' not in udata:
+            print('bad data')
+            exit(1)
+        r = self.s2.post('https://hub.qpyou.cn/otp/verification', data=udata, headers={'Accept':'application/json, text/javascript, */*; q=0.01','Origin':'https://hub.qpyou.cn','X-Requested-With':'XMLHttpRequest','User-Agent':'Mozilla/5.0 (Linux; Android 7.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36','Content-Type':'application/x-www-form-urlencoded; charset=UTF-8','DNT':'1','Referer':'https://hub.qpyou.cn/otp/main'})
+        return json.loads(r.content)['result'] == 0
 
     def hiveLogin(self, user, password):
         if self.phone == 'xxx':
@@ -119,44 +137,53 @@ class QPYOU(object):
             vend_id = rndDeviceId()
         else:
             ad_id = rndDeviceId()
-            device = 'iPad5,4'
-            appid = 'com.com2us.smon.normal.freefull.apple.kr.ios.universal'
-            native_ver = 'Hub v.2.6.4'
-            osversion = '10.2'
-            platform = 'ios'
-            user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like Mac OS X) AppleWebKit/602.3.12 (KHTML, ' \
-                         'like Gecko) Version/10.0 Mobile/14C92 Safari/602.1 '
+            device = 'SM-G955F'
+            appid = 'com.com2us.smon.normal.freefull.google.kr.android.common'
+            native_ver = 'Hive+v.2.6.7'
+            osversion = '7.0'
+            platform = 'android'
+            user_agent = 'Mozilla/5.0 (Linux; Android 7.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36'
             vend_id = rndDeviceId()
-        self.s.cookies.update(
-            {'advertising_id': ad_id, 'appid': appid,
-             'device': device, 'did': str(random.randint(200000000, 300000000)) if not self.did else str(self.did),
-             'native_version': native_ver, 'osversion': osversion, 'platform': platform,
-             'vendor_id': vend_id})
-        self.registered()
-        self.s.post('https://hub.qpyou.cn/auth',
-                    data='{"hive_country":"EN","device_country":"en","timezone":null,"language":"en",'
-                         '"game_language":"en","server_id":""}',
-                    allow_redirects=False)
-        data = {'id': user, 'password': '', 'dkagh': MD5(password.encode('utf-8'))}
-        self.s.get('https://hub.qpyou.cn/auth/recent_account')
-        rr = self.s.post('https://hub.qpyou.cn/auth/login_proc', data=data,
-                         headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                                  'User-Agent': user_agent,
-                                  'Referer': 'https://hub.qpyou.cn/auth/login'}, allow_redirects=False)
-        sss = rr.headers['Location'].split('&')
-        sessionkey = sss[3].replace('sessionkey=', '')
-        _did = sss[2].replace('did=', '')
-        res = self.me()
-        if not res:
+        self.s2 = requests.Session()
+        self.s2.verify = False
+        self.s2.headers.update({'Upgrade-Insecure-Requests':'1','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1'})
+        if 'Admin-PC' == socket.gethostname():
+            self.s2.proxies.update({'http': 'http://127.0.0.1:8888','https': 'https://127.0.0.1:8888',})
+        s2r = self.s2.get('https://hub.qpyou.cn/auth')
+        # print(s2r.content)
+        if '/hub.qpyou.cn/auth/login_proc' not in s2r.content.decode():
+            print('login page broken')
+            exit(1)
+        rr = self.s2.post('https://hub.qpyou.cn/auth/login_proc',data='id={}&password=&dkagh={}'.format(user,MD5(password)),headers={'Cache-Control':'max-age=0','Origin':'https://hub.qpyou.cn','Upgrade-Insecure-Requests':'1','Content-Type':'application/x-www-form-urlencoded','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1','Referer':'https://hub.qpyou.cn/auth/login'})
+        if '/otp/main' in rr.url:
+            print('detected otp...')
+            if 'class="join_otp"' in rr.content:
+                _send_to = re.search('class="user_inform">(.*)</span>',rr.content).group(1)
+                _udata = input('Open this: /otp/aes.html?mail=%s&code=123456 and paste the console log here:\n'%(_send_to))
+                if self.otpVerification(_udata.rstrip()):
+                    rr = self.s2.get('https://hub.qpyou.cn/otp/login',headers={'Cache-Control':'max-age=0','Origin':'https://hub.qpyou.cn','Upgrade-Insecure-Requests':'1','Content-Type':'application/x-www-form-urlencoded','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1','Referer':'https://hub.qpyou.cn/otp/main'})
+                    if '/gdpr/login' in rr.url:
+                        rr = self.s2.post('https://hub.qpyou.cn/userinfo/gdpr/done',data='',headers={'Cache-Control':'max-age=0','Origin':'https://hub.qpyou.cn','Upgrade-Insecure-Requests':'1','Content-Type':'application/x-www-form-urlencoded','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1','Referer':'https://hub.qpyou.cn/userinfo/gdpr/login'},allow_redirects=False)
+        self.s2.cookies.update({'gameindex':'2624','hive_config_language':'en_US','inquiry_language':'en_US','advertising_id':str(ad_id),'appid':appid,'device':device,'did':str(random.randint(200000000,300000000)) if not self.did else str(self.did),'native_version':native_ver,'osversion':osversion,'platform':platform,'vendor_id':vend_id})
+        rr = self.s2.post('https://hub.qpyou.cn/auth/login_proc',data='id={}&password=&dkagh={}'.format(user,MD5(password)),headers={'Cache-Control':'max-age=0','Origin':'https://hub.qpyou.cn','Upgrade-Insecure-Requests':'1','Content-Type':'application/x-www-form-urlencoded','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1','Referer':'https://hub.qpyou.cn/auth/login'},allow_redirects=False)
+        _uid = None
+        if 'gdpr/login' in rr.headers['Location']:
+            rr = self.s2.post('https://hub.qpyou.cn/userinfo/gdpr/done',data='',headers={'Cache-Control':'max-age=0','Origin':'https://hub.qpyou.cn','Upgrade-Insecure-Requests':'1','Content-Type':'application/x-www-form-urlencoded','User-Agent':user_agent,'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','DNT':'1','Referer':'https://hub.qpyou.cn/userinfo/gdpr/login'},allow_redirects=False)
+        if 'c2shub://login?error_code' in rr.headers['Location']:
+            sss = rr.headers['Location'].split('&')
+            _uid = sss[1].replace('uid=','')
+            sessionkey = sss[3].replace('sessionkey=','')
+            _did = sss[2].replace('did=','')
+            print(sss)
+        if not _uid:
             return None
-        return res['uid'], _did, sessionkey, appid
+        return _uid, _did, sessionkey, appid
 
     def createNew(self):
         self.s.cookies.update(
-            {'advertising_id': rndDeviceId(), 'appid': 'com.com2us.smon.normal.freefull.apple.kr.ios.universal',
-             'device': 'iPad5,4', 'did': str(random.randint(200000000, 300000000)) if not self.did else str(self.did),
-             'native_version': 'Hub v.2.6.4', 'osversion': '10.2', 'platform': 'ios',
+            {'advertising_id': rndDeviceId(), 'appid': 'com.com2us.smon.normal.freefull.google.kr.android.common',
+             'device': 'SM-G955F', 'did': str(random.randint(200000000, 300000000)) if not self.did else str(self.did),
+             'native_version': 'Hive+v.2.6.7', 'osversion': '7.0', 'platform': 'android',
              'vendor_id': rndDeviceId()})
         self.registered()
         res = self.create()
