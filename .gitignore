@@ -4,6 +4,7 @@ charles_helper
 pre2.py
 bad.py
 decode.py
+.vscode/settings.json
 .vscode/
 test.py
 venv
