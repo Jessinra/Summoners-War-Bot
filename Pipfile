@@ -5,17 +5,18 @@ name = "pypi"
 
 [packages]
 pillow = "*"
-"bs4" = "*"
+bs4 = "*"
 requests = "*"
-"urllib3" = "*"
+urllib3 = "*"
 pycryptodome = "*"
 googletrans = "*"
 bitstring = "*"
 
 [dev-packages]
-"flake8" = "*"
+flake8 = "*"
 pylint = "*"
-"autopep8" = "*"
+autopep8 = "*"
+pep8 = "*"
 
 [requires]
 python_version = "3.6"
