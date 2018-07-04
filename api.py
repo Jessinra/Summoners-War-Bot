@@ -24,6 +24,10 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class API(object):
+
+    USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
+    USER_AGENT_SCRAPE = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+
     def __init__(self, uid, did, id_=None, email=None, session=None, device=None, app_id=None, debug=0):
         self.logger = logging.getLogger('API')
         self.logger.setLevel(logging.INFO)
@@ -48,12 +52,10 @@ class API(object):
         net_version_str = ''.join(net_version)
         net_version_str = ''.join(
             [net_version_str, '0' * (5 - len(net_version_str))])
-        self.s.headers.update({'User-Agent': ''.join(['SMON_KR/', str(
-            self.app_version), '.', net_version_str, ' CFNetwork/808.2.16 Darwin/16.3.0'])})
+        self.s.headers.update({'User-Agent': USER_AGENT})
         if app_id and 'android' in str(app_id):
             sess_ver = requests.Session()
-            ua = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'
-            headers = {'User-Agent': ua, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
+            headers = {'User-Agent': USER_AGENT_SCRAPE, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
             sess_ver.headers.update(headers)
             version = None
             tries = 0
@@ -84,11 +86,11 @@ class API(object):
                 self.log('New app version found: {}'.format(version))
                 self.log(
                     'For security reasons bot tries to download new android apk.')
-                net_version_str = ''.join(net_version)
-                net_version_str = net_version_str + \
-                    '0' * (5 - len(net_version_str))
-                self.s.headers.update({'User-Agent': 'SMON_KR/' + str(
-                    self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
+                # net_version_str = ''.join(net_version)
+                # net_version_str = net_version_str + \
+                #     '0' * (5 - len(net_version_str))
+                # self.s.headers.update({'User-Agent': 'SMON_KR/' + str(
+                #     self.app_version) + '.' + net_version_str + ' CFNetwork/808.2.16 Darwin/16.3.0'})
                 try:
                     self.binary_check, self.binary_size = checkAndroidApk()
                     self.log('MD5: {}, binary_size: {}'.format(
