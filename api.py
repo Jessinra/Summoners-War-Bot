@@ -28,6 +28,11 @@ class API(object):
 
     USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
     USER_AGENT_SCRAPE = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+    APP_VERSION = "3.8.9"
+    GAME_INDEX = 2624
+    PROTO_VER = 11160
+    BINARY_SIZE = 28748100
+    BINARY_CHECK = "6cc82ba2c5e7a7e79eb761103261373b"
 
     def __init__(self, uid, did, id_=None, email=None, session=None, device=None, app_id=None, debug=0):
         self.logger = logging.getLogger('API')
@@ -46,9 +51,9 @@ class API(object):
         # if 'Admin-PC' == socket.gethostname():
         #     self.s.proxies.update({'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
 
-        self.game_index = 2624
-        self.proto_ver = 11150
-        self.app_version = '3.8.8'
+        self.game_index = API.GAME_INDEX
+        self.proto_ver = API.PROTO_VER
+        self.app_version = API.APP_VERSION
         net_version = self.app_version.split('.')
         net_version_str = ''.join(net_version)
         net_version_str = ''.join(
@@ -81,8 +86,8 @@ class API(object):
                     return
             net_version = version.split('.')
             given_version = self.app_version.split('.')
-            self.binary_size = 28737464
-            self.binary_check = 'e4d414019ee3fe5d03d51cf3bff09c99'
+            self.binary_size = API.BINARY_SIZE
+            self.binary_check = API.BINARY_CHECK
             print(self.binary_check, self.binary_size)
             sess_ver.close()
             if len(version) > len(self.app_version) or any([int(net_version[i]) > int(given_version[i])
