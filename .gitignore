@@ -9,3 +9,4 @@ decode.py
 test.py
 venv
 settings.json
+Pipfile.lock
