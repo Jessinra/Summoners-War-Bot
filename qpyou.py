@@ -22,9 +22,6 @@ from tools import rndDeviceId
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
-USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
-USER_AGENT_HUB = "Mozilla/5.0 (Linux; Android 7.0.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36"
-
 
 def MD5(i):
     m = hashlib.md5()
@@ -33,13 +30,17 @@ def MD5(i):
 
 
 class Activeuser():
+
+    USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
+    USER_AGENT_HUB = "Mozilla/5.0 (Linux; Android 7.0.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36"
+
     def __init__(self):
         self.encoder = Pkcs7Encoder()
         self.mode = AES.MODE_CBC
         self.s = requests.session()
         self.s.verify = False
         self.s.headers.update({'Content-Type': 'text/html', 'Accept-Language': 'en-gb',
-                               'User-Agent': USER_AGENT})
+                               'User-Agent': Activeuser.USER_AGENT})
 
     def get_ts(self):
         return str(int(time.time()))
@@ -76,6 +77,10 @@ class Activeuser():
 
 
 class QPYOU(object):
+
+    USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
+    USER_AGENT_HUB = "Mozilla/5.0 (Linux; Android 7.0.0; SM-G955F Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/63.0.3239.111 Mobile Safari/537.36"
+
     def __init__(self, did=None, phone=None):
         self.s = requests.Session()
         self.s.verify = False
@@ -83,7 +88,7 @@ class QPYOU(object):
             self.s.proxies.update(
                 {'http': 'http://127.0.0.1:8888', 'https': 'https://127.0.0.1:8888', })
         self.s.headers.update({
-            'User-Agent': USER_AGENT,
+            'User-Agent': QPYOU.USER_AGENT,
             'Accept-Language': 'en-gb'})
         self.did = did
         self.guest_uid = None
@@ -122,8 +127,8 @@ class QPYOU(object):
         return json.loads(self.s.post('https://api.qpyou.cn/device/registered', data=self.p1 % (self.hive_country)).content)
 
     def me(self):
-        es = self.s2.post('https://api.qpyou.cn/user/me', data=self.p1 % (self.hive_country), headers={
-                          'Content-Type': 'application/json', 'Accept-Language': 'en-gb', 'User-Agent': USER_AGENT})
+        res = self.s2.post('https://api.qpyou.cn/user/me', data=self.p1 % (self.hive_country), headers={
+            'Content-Type': 'application/json', 'Accept-Language': 'en-gb', 'User-Agent': QPYOU.USER_AGENT})
         # print(str(res.content))
         if 'thorization Faile' in str(res.content):
             return None
@@ -134,7 +139,7 @@ class QPYOU(object):
             print('bad data')
             exit(1)
         r = self.s2.post('https://hub.qpyou.cn/otp/verification', data=udata, headers={'Accept': 'application/json, text/javascript, */*; q=0.01', 'Origin': 'https://hub.qpyou.cn', 'X-Requested-With': 'XMLHttpRequest',
-                                                                                       'User-Agent': USER_AGENT_HUB, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/otp/main'})
+                                                                                       'User-Agent': QPYOU.USER_AGENT_HUB, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/otp/main'})
         return json.loads(r.content)['result'] == 0
 
     def hiveLogin(self, user, password):
@@ -155,7 +160,7 @@ class QPYOU(object):
             vend_id = rndDeviceId()
         self.s2 = requests.Session()
         self.s2.verify = False
-        self.s2.headers.update({'Upgrade-Insecure-Requests': '1', 'User-Agent': USER_AGENT_HUB,
+        self.s2.headers.update({'Upgrade-Insecure-Requests': '1', 'User-Agent': QPYOU.USER_AGENT_HUB,
                                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1'})
         if 'Admin-PC' == socket.gethostname():
             self.s2.proxies.update(
@@ -166,7 +171,7 @@ class QPYOU(object):
             print('login page broken')
             exit(1)
         rr = self.s2.post('https://hub.qpyou.cn/auth/login_proc', data='id={}&password=&dkagh={}'.format(user, MD5(password)), headers={'Cache-Control': 'max-age=0', 'Origin': 'https://hub.qpyou.cn', 'Upgrade-Insecure-Requests': '1',
-                                                                                                                                        'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/auth/login'})
+                                                                                                                                        'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/auth/login'})
         if '/otp/main' in rr.url:
             print('detected otp...')
             if 'class="join_otp"' in rr.content:
@@ -176,18 +181,18 @@ class QPYOU(object):
                     'Open this: /otp/aes.html?mail=%s&code=123456 and paste the console log here:\n' % (_send_to))
                 if self.otpVerification(_udata.rstrip()):
                     rr = self.s2.get('https://hub.qpyou.cn/otp/login', headers={'Cache-Control': 'max-age=0', 'Origin': 'https://hub.qpyou.cn', 'Upgrade-Insecure-Requests': '1', 'Content-Type': 'application/x-www-form-urlencoded',
-                                                                                'User-Agent': USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/otp/main'})
+                                                                                'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/otp/main'})
                     if '/gdpr/login' in rr.url:
                         rr = self.s2.post('https://hub.qpyou.cn/userinfo/gdpr/done', data='', headers={'Cache-Control': 'max-age=0', 'Origin': 'https://hub.qpyou.cn', 'Upgrade-Insecure-Requests': '1', 'Content-Type': 'application/x-www-form-urlencoded',
-                                                                                                       'User-Agent': USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/userinfo/gdpr/login'}, allow_redirects=False)
+                                                                                                       'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/userinfo/gdpr/login'}, allow_redirects=False)
         self.s2.cookies.update({'gameindex': '2624', 'hive_config_language': 'en_US', 'inquiry_language': 'en_US', 'advertising_id': str(ad_id), 'appid': appid, 'device': device, 'did': str(
             random.randint(200000000, 300000000)) if not self.did else str(self.did), 'native_version': native_ver, 'osversion': osversion, 'platform': platform, 'vendor_id': vend_id})
         rr = self.s2.post('https://hub.qpyou.cn/auth/login_proc', data='id={}&password=&dkagh={}'.format(user, MD5(password)), headers={'Cache-Control': 'max-age=0', 'Origin': 'https://hub.qpyou.cn', 'Upgrade-Insecure-Requests': '1',
-                                                                                                                                        'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/auth/login'}, allow_redirects=False)
+                                                                                                                                        'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/auth/login'}, allow_redirects=False)
         _uid = None
         if 'gdpr/login' in rr.headers['Location']:
             rr = self.s2.post('https://hub.qpyou.cn/userinfo/gdpr/done', data='', headers={'Cache-Control': 'max-age=0', 'Origin': 'https://hub.qpyou.cn', 'Upgrade-Insecure-Requests': '1', 'Content-Type': 'application/x-www-form-urlencoded',
-                                                                                           'User-Agent': USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/userinfo/gdpr/login'}, allow_redirects=False)
+                                                                                           'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/userinfo/gdpr/login'}, allow_redirects=False)
         if 'c2shub://login?error_code' in rr.headers['Location']:
             sss = rr.headers['Location'].split('&')
             _uid = sss[1].replace('uid=', '')

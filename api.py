@@ -1,24 +1,25 @@
+import ast
 import itertools
 import json
 import logging
 import math
 import random
 import socket
+import threading
 import time
 from collections import OrderedDict
+from crypt import Crypter
 from random import randint
-import ast
-import threading
-from fake_useragent import UserAgent
+
 import requests
 import urllib3
 from bs4 import BeautifulSoup
 from urllib3.exceptions import InsecureRequestWarning
-from island_maps import IslandMaps
 
-from crypt import Crypter
+from fake_useragent import UserAgent
+from island_maps import IslandMaps
 from mapping import dungeon_quest_map
-from tools import isIn, list_to_dict, checkAndroidApk, updateDict, find
+from tools import checkAndroidApk, find, isIn, list_to_dict, updateDict
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -52,27 +53,31 @@ class API(object):
         net_version_str = ''.join(net_version)
         net_version_str = ''.join(
             [net_version_str, '0' * (5 - len(net_version_str))])
-        self.s.headers.update({'User-Agent': USER_AGENT})
+        self.s.headers.update({'User-Agent': API.USER_AGENT})
         if app_id and 'android' in str(app_id):
             sess_ver = requests.Session()
-            headers = {'User-Agent': USER_AGENT_SCRAPE, 'Host': 'play.google.com', 'Connection': 'keep-alive'}
+            headers = {'User-Agent': API.USER_AGENT_SCRAPE,
+                       'Host': 'play.google.com', 'Connection': 'keep-alive'}
             sess_ver.headers.update(headers)
             version = None
             tries = 0
             max_tries = 5
             while not version and tries < max_tries:
-                version_req = sess_ver.get('https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
+                version_req = sess_ver.get(
+                    'https://play.google.com/store/apps/details?id=' + app_id, allow_redirects=True, timeout=10).content
                 soup = BeautifulSoup(version_req, "html.parser")
                 tries += 1
                 try:
-                    version = soup.find('div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
+                    version = soup.find(
+                        'div', {'class': 'content', 'itemprop': 'softwareVersion'}).text.strip()
                 except AttributeError:
                     vers = soup.find('div', text='Current Version')
                     help_list = [tag for tag in vers.parent]
                     if help_list:
                         version = help_list[-1].text
                 if tries == max_tries:
-                    self.log('Finding recent version failed 5 times, now quitting for safety reasons.')
+                    self.log(
+                        'Finding recent version failed 5 times, now quitting for safety reasons.')
                     return
             net_version = version.split('.')
             given_version = self.app_version.split('.')
@@ -107,7 +112,8 @@ class API(object):
                     version = soup.find('p', {'class': 'l-column small-6 medium-12 whats-new__latest__version'}).text.replace(
                         'Version', '').strip()
                 except:
-                    self.log('Error retrieving recent app version, try again in 5s')
+                    self.log(
+                        'Error retrieving recent app version, try again in 5s')
                     time.sleep(5)
             net_version = version.split('.')
             given_version = self.app_version.split('.')
@@ -260,11 +266,15 @@ class API(object):
         regions = ['gb', 'hub', 'jp', 'cn', 'sea', 'eu']
         locations = json.loads(self.crypter.decrypt_response(self.s.get(self.c2_location).content,
                                                              2 if '_c2.php' in self.c2_location else 1))
-        self.c2_status = locations['server_url_list'][regions.index(self.region)]['status']
-        self.c2_version = locations['server_url_list'][regions.index(self.region)]['version']
-        self.c2_api = locations['server_url_list'][regions.index(self.region)]['gateway']
+        self.c2_status = locations['server_url_list'][regions.index(
+            self.region)]['status']
+        self.c2_version = locations['server_url_list'][regions.index(
+            self.region)]['version']
+        self.c2_api = locations['server_url_list'][regions.index(
+            self.region)]['gateway']
         if self.debug == 1:
-            self.log('{} {} {} {}'.format(self.c2_location, self.c2_status, self.c2_version, self.c2_api))
+            self.log('{} {} {} {}'.format(self.c2_location,
+                                          self.c2_status, self.c2_version, self.c2_api))
 
     def getServerStatus(self):
         data = {'game_index': self.game_index,
@@ -909,7 +919,7 @@ class API(object):
 
     def BuyShopItem(self, item_id, island_id=0, pos_x=0, pos_y=0):
         if self.debug == 1:
-           self.log('{}'.format(self.shop_interval_list))
+            self.log('{}'.format(self.shop_interval_list))
         data = self.base_data('BuyShopItem', 2)
         extra_data = OrderedDict([('item_id', item_id), ('island_id', island_id), ('pos_x', pos_x),
                                   ('pos_y', pos_y)])
@@ -960,7 +970,8 @@ class API(object):
                                   ('source_list', source_list)])
         data.update(extra_data)
         if self.debug == 1:
-            self.log('{} {} {} {} {} {}'.format(target_id, source_list, island_id, pos_x, pos_y, building_id))
+            self.log('{} {} {} {} {} {}'.format(
+                target_id, source_list, island_id, pos_x, pos_y, building_id))
         res = self.call_api(self.c2_api, data)
         if res:
             self.UpdateDailyQuestById(2, 1)
@@ -1489,7 +1500,8 @@ class API(object):
         status = self.getServerStatus()['maintenace']
         while status == 1:
             wait_time = random.randint(250, 350)
-            self.log('Server {} undergoing maintenance right now, waiting for {} seconds.'.format(self.region, wait_time))
+            self.log('Server {} undergoing maintenance right now, waiting for {} seconds.'.format(
+                self.region, wait_time))
             time.sleep(wait_time)
             status = self.getServerStatus()['maintenace']
         self.getVersionInfo()
@@ -1512,9 +1524,12 @@ class API(object):
             mac = '02:00:00:00:00:00'
             token = '0000000000000000000000000000000000000000000000000000000000000000'
         data = OrderedDict([('command', 'HubUserLogin'), ('game_index', self.game_index), ('proto_ver', self.proto_ver),
-                            ('app_version', self.app_version), ('session_key', self.session_key),
-                            ('infocsv', self.infocsv), ('uid', self.uid), ('channel_uid', self.uid), ('did', self.did),
-                            ('id', self.id), ('email', self.email), ('push', 1), ('is_emulator', 0), ('country', 'EN'),
+                            ('app_version', self.app_version), ('session_key',
+                                                                self.session_key),
+                            ('infocsv', self.infocsv), ('uid',
+                                                        self.uid), ('channel_uid', self.uid), ('did', self.did),
+                            ('id', self.id), ('email', self.email), ('push',
+                                                                     1), ('is_emulator', 0), ('country', 'EN'),
                             ('lang', 'eng'), ('lang_game', 1), ('mac_address', mac),
                             ('device_name', device_name), ('os_version', os_version),
                             ('token', token), ('idfv', ''), ('adid', ''),
@@ -1587,12 +1602,14 @@ class API(object):
         # self.log('{} {} {} {}'.format(dungeon_id, stage_id, unit_id_list, helper_list))
         if self.debug == 1:
             self.log('{}'.format(helper_list))
-        dungeon_start = self.BattleDungeonStart(dungeon_id, stage_id, unit_id_list, helper_list)
+        dungeon_start = self.BattleDungeonStart(
+            dungeon_id, stage_id, unit_id_list, helper_list)
         if not dungeon_start:
             self.log('Dungeon: {}, stage: {} not successfully started'.format(
                 dungeon_id, stage_id))
             return
-        battley_key, opp_unit_status_list = API.parseBattleStart(dungeon_start, win_lose)
+        battley_key, opp_unit_status_list = API.parseBattleStart(
+            dungeon_start, win_lose)
         time.sleep(int(clear_time/1000))
         dungeon_end = self.BattleDungeonResult(battley_key, dungeon_id, stage_id, unit_id_list, opp_unit_status_list,
                                                clear_time, win_lose)
@@ -1615,9 +1632,11 @@ class API(object):
             if not arena_start:
                 self.log('Battle not successfully started.')
                 return
-            battle_key, opp_unit_status_list = API.parseBattleStart(arena_start, win_lose)
+            battle_key, opp_unit_status_list = API.parseBattleStart(
+                arena_start, win_lose)
             time.sleep(random.randint(30, 40))
-            arena_end = self.BattleArenaResult(battle_key, opp_unit_status_list, unit_id_list, win_lose)
+            arena_end = self.BattleArenaResult(
+                battle_key, opp_unit_status_list, unit_id_list, win_lose)
             self.parseBattleResult(arena_end)
             time.sleep(3)
         else:
@@ -1634,9 +1653,11 @@ class API(object):
         if not battle_start:
             self.log('Battle not successfully started.')
             return
-        battle_key, opp_unit_status_list = API.parseBattleStart(battle_start, win_lose)
+        battle_key, opp_unit_status_list = API.parseBattleStart(
+            battle_start, win_lose)
         time.sleep(int(clear_time/1000))
-        battle_end = self.BattleTrialTowerResult_v2(battle_key, difficulty, floor_id, win_lose, unit_id_list, opp_unit_status_list)
+        battle_end = self.BattleTrialTowerResult_v2(
+            battle_key, difficulty, floor_id, win_lose, unit_id_list, opp_unit_status_list)
         self.parseBattleResult(battle_end)
         time.sleep(3)
 
@@ -1683,8 +1704,10 @@ class API(object):
             self.log('Battle not successfully started.')
             return False
         res = API.parseBattleStart(battle_start, win_lose)
-        self.log('Battle started: region {}, stage {}, difficulty {}'.format(region_id, stage_no, difficulty))
-        unit_result_list = [{'unit_id': unit['unit_id'], 'pos_id': i + 1} for i, unit in enumerate(unit_id_list)]
+        self.log('Battle started: region {}, stage {}, difficulty {}'.format(
+            region_id, stage_no, difficulty))
+        unit_result_list = [{'unit_id': unit['unit_id'], 'pos_id': i + 1}
+                            for i, unit in enumerate(unit_id_list)]
         time.sleep(int(clear_time/1000))
         # self.log('{} {} {} {} {} {}'.format(res[0], res[1], unit_id_list,
         #                                        {"island_id": self.last_position['island_id'],
@@ -1722,14 +1745,18 @@ class API(object):
                 if region_list:
                     for region in region_list:
                         try:
-                            self.scenario_list[region['i']]['stage_list'][input_['stage_no']-1]['cleared'] = input_['cleared']
+                            self.scenario_list[region['i']]['stage_list'][input_[
+                                'stage_no']-1]['cleared'] = input_['cleared']
                         except IndexError:
-                            self.scenario_list[region['i']]['stage_list'].append({'stage_no': input_['stage_no'], 'cleared': input_['cleared']})
+                            self.scenario_list[region['i']]['stage_list'].append(
+                                {'stage_no': input_['stage_no'], 'cleared': input_['cleared']})
                         if input_['stage_no'] == 7 and input_['cleared'] == 1:
-                                self.scenario_list[region['i']]['cleared'] = 1
+                            self.scenario_list[region['i']]['cleared'] = 1
                 else:
-                    stage_list = [{'stage_no': i, 'cleared': 0} for i in range(1, 8)]
-                    stage_list[input_['stage_no']-1]['cleared'] = input_['cleared']
+                    stage_list = [{'stage_no': i, 'cleared': 0}
+                                  for i in range(1, 8)]
+                    stage_list[input_['stage_no'] -
+                               1]['cleared'] = input_['cleared']
                     self.scenario_list.append({'region_id': input_['region_id'], 'difficulty': input_['difficulty'],
                                                'cleared': 0, 'stage_list': stage_list})
                 if self.debug == 1:
@@ -1746,8 +1773,10 @@ class API(object):
                     self.log(self._getQuestActive())
                     self.log(self._get_quest_rewarded())
                     self.log(json.loads(res)['reward_info']['quest_id'])
-                self.quest_active.pop(json.loads(res)['reward_info']['quest_id'])
-                self.quest_rewarded.append(json.loads(res)['reward_info']['quest_id'])
+                self.quest_active.pop(json.loads(
+                    res)['reward_info']['quest_id'])
+                self.quest_rewarded.append(
+                    json.loads(res)['reward_info']['quest_id'])
                 if self.debug == 1:
                     self.log(self._getQuestActive())
                     self.log(self._get_quest_rewarded())
@@ -1804,7 +1833,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('worldboss_status', res):
             try:
-                self._update_worldboss_status(json.loads(res)['worldboss_status'])
+                self._update_worldboss_status(
+                    json.loads(res)['worldboss_status'])
                 if self.debug == 1:
                     self.log(self._get_worldboss_status())
             except KeyError:
@@ -1836,7 +1866,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('worldboss_used_unit', res):
             try:
-                self._update_worldboss_used_unit(json.loads(res)['worldboss_used_unit'])
+                self._update_worldboss_used_unit(
+                    json.loads(res)['worldboss_used_unit'])
                 if self.debug == 1:
                     self.log(self._get_worldboss_used_unit())
             except KeyError:
@@ -1844,7 +1875,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('defense_unit_list', res):
             try:
-                self._updateDefenseUnitList(json.loads(res)['defense_unit_list'])
+                self._updateDefenseUnitList(
+                    json.loads(res)['defense_unit_list'])
                 if self.debug == 1:
                     self.log(self._getDefenseUnitList())
             except KeyError:
@@ -1860,7 +1892,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('shop_interval_info', res):
             try:
-                self._updateShopIntervalList(json.loads(res)['shop_interval_info'])
+                self._updateShopIntervalList(
+                    json.loads(res)['shop_interval_info'])
                 if self.debug == 1:
                     self.log(self._getShopIntervalList())
             except KeyError:
@@ -1868,7 +1901,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('interval_list', res):
             try:
-                self._updateShopIntervalList(json.loads(res)['shop_info']['interval_list'])
+                self._updateShopIntervalList(
+                    json.loads(res)['shop_info']['interval_list'])
                 if self.debug == 1:
                     self.log(self._getShopIntervalList())
             except KeyError:
@@ -1917,7 +1951,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('item_list', res):
             try:
-                self._updateShopItemList(json.loads(res)['shop_info']['item_list'])
+                self._updateShopItemList(
+                    json.loads(res)['shop_info']['item_list'])
                 if self.debug == 1:
                     self.log(self._get_shop_item_list())
             except KeyError:
@@ -1975,7 +2010,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('unit_depository_slots', res):
             try:
-                self._updateUnitDepositorySlots(json.loads(res)['unit_depository_slots'])
+                self._updateUnitDepositorySlots(
+                    json.loads(res)['unit_depository_slots'])
                 if self.debug == 1:
                     self.log(self._getUnitDepositorySlots())
             except KeyError:
@@ -2106,7 +2142,8 @@ class API(object):
                 self.log(json.loads(res))
         if isIn('daily_reward_info', res):
             try:
-                self._update_daily_reward_info(json.loads(res)['daily_reward_info'])
+                self._update_daily_reward_info(
+                    json.loads(res)['daily_reward_info'])
                 if self.debug == 1:
                     self.log(self._getDailyRewardInfo())
             except KeyError:
@@ -2130,7 +2167,8 @@ class API(object):
                 return None
 
             if self.debug == 1:
-                self.log('ret_code: {} command: {}'.format(rj['ret_code'], rj['command']))
+                self.log('ret_code: {} command: {}'.format(
+                    rj['ret_code'], rj['command']))
         return rj
 
     def _check_request_data(self, data):
