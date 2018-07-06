@@ -25,7 +25,7 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 def MD5(i):
     m = hashlib.md5()
-    m.update(i)
+    m.update(i.encode())
     return m.hexdigest()
 
 
