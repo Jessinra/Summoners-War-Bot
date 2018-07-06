@@ -859,7 +859,7 @@ class API(object):
                                   ('island_id',
                                    self.last_position['island_id']),
                                   ('pos_x', self.last_position['pos_x']),
-                                  ('pos_y', self.last_position['pos_y']), ('clear_time', clear_time), ('retry', 0)])
+                                  ('pos_y', self.last_position['pos_y']), ('clear_time', clear_time), ('retry', 0), ('leader_exist', 1)])
         data.update(extra_data)
         res = self.call_api(self.c2_api, data)
         if res and dungeon_id in list(dungeon_quest_map.keys()):
