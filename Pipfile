@@ -16,7 +16,6 @@ bitstring = "*"
 flake8 = "*"
 pylint = "*"
 autopep8 = "*"
-pycodestyle = "*"
 
 [requires]
 python_version = "3.6"
