@@ -45,7 +45,7 @@ class API(object):
         self.logger.addHandler(self.fh)
         self.debug = debug
         self.crypter = Crypter()
-        self.s = requests.session()
+        self.s = requests.Session()
         self.s.verify = False
 
         # if 'Admin-PC' == socket.gethostname():

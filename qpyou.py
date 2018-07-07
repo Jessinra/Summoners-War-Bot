@@ -195,6 +195,7 @@ class QPYOU(object):
                                                                                            'User-Agent': QPYOU.USER_AGENT_HUB, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'DNT': '1', 'Referer': 'https://hub.qpyou.cn/userinfo/gdpr/login'}, allow_redirects=False)
         if 'c2shub://login?error_code' in rr.headers['Location']:
             sss = rr.headers['Location'].split('&')
+            # print(rr.headers)
             _uid = sss[1].replace('uid=', '')
             sessionkey = sss[3].replace('sessionkey=', '')
             _did = sss[2].replace('did=', '')
