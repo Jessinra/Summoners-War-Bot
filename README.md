@@ -1,4 +1,4 @@
-# Summoners-War-Bot (Py3)
+# Summoners-War-Bot (Python 3)
 
 Forked from https://github.com/Mila432/Summoners-War-Bot
 Credits for all technical stuff go to Mila432.
