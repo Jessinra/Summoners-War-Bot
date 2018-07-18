@@ -1,25 +1,26 @@
 # Summoners-War-Bot (Python 3)
 
-Forked from https://github.com/Mila432/Summoners-War-Bot
-Credits for all technical stuff go to Mila432.
-Just updated his base to Python 3 and added some storing methods of all the api data and a seperate bot-tool
+Forked from [Mila432](https://github.com/Mila432/Summoners-War-Bot). Just updated his base to Python 3 and added some storing methods of all the api data and a seperate bot-tool
 which should contain all the logical stuff to keep the api as clean as possible.
 
 ## Getting Started
 
 ### Prerequisites
+
 * [Python >= 3.6](https://www.python.org/downloads/)
 * [Pipenv](https://github.com/pypa/pipenv)
 
 ### Download and Installation
-```
-$ git clone https://github.com/fnk93/Summoners-War-Bot.git
-$ pipenv install
+
+```bash
+git clone https://github.com/fnk93/Summoners-War-Bot.git
+pipenv install
 ```
 
 ### Setting up your account
 
 Set up your device id:
+
 1. Open your account on your mobile device.
 2. Tap on your Account info in the top left corner.
 3. Press Com2Us-Hive.
@@ -37,6 +38,7 @@ Set up your account:
 6. Set "region = ''" to "region = 'your region'". (gb = global, eu = europe, jp = japan, sea = asia, cn = china)
 
 ### Run the bot
-```
-$ pipenv run python mybot.py
+
+```bash
+pipenv run python mybot.py
 ```
