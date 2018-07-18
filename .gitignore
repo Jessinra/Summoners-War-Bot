@@ -12,3 +12,4 @@ settings.json
 Pipfile.lock
 mycode_test.py
 log.log
+config.json
