@@ -17,8 +17,11 @@ fake-useragent = "*"
 flake8 = "*"
 pylint = "*"
 black = "*"
+<<<<<<< HEAD
 pydocstyle = "*"
 rope = "*"
+=======
+>>>>>>> 07a4ff3871f9fdc296bc57cd201c05792cad91bc
 
 [requires]
 python_version = "3.6"
