@@ -20,24 +20,21 @@ $ pipenv install
 ### Setting up your account
 
 Set up your device id:
-```
-Open your account on your mobile device.
-Tap on your Account info in the top left corner.
-Press Com2Us-Hive.
-Open the menu on the top left.
-Scroll to the bottom to find you DID.
-Go to config.json and replace null with "your DID"
-```
+1. Open your account on your mobile device.
+2. Tap on your Account info in the top left corner.
+3. Press Com2Us-Hive.
+4. Open the menu on the top left.
+5. Scroll to the bottom to find you DID.
+6. Go to config.json and replace null with "your DID"
 
 Set up your account:
-```
-Open mybot.py with any text editor.
-Scroll to the bottom to "if __name__ == "__main__":".
-Set "user = ''" to "user = 'your hive id'".
-Set "user_mail = ''" to "user = 'your hive e-mail'".
-Set "pw = ''" to "pw = 'your hive password'".
-Set "region = ''" to "region = 'your region'". (gb = global, eu = europe, jp = japan, sea = asia, cn = china)
-```
+
+1. Open mybot.py with any text editor.
+2. Scroll to the bottom to "if __name__ == "__main__":".
+3. Set "user = ''" to "user = 'your hive id'".
+4. Set "user_mail = ''" to "user = 'your hive e-mail'".
+5. Set "pw = ''" to "pw = 'your hive password'".
+6. Set "region = ''" to "region = 'your region'". (gb = global, eu = europe, jp = japan, sea = asia, cn = china)
 
 ### Run the bot
 ```
