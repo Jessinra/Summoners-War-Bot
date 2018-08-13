@@ -1,18 +1,19 @@
+import binascii
+import codecs
 import hashlib
+import json
 import random
 import shutil
-import binascii
-from bitstring import ConstBitStream, ReadError
-from enum import IntEnum
-import json
-import codecs
-from googletrans import Translator
-from io import StringIO
 import socket
+import time
 import struct
+from enum import IntEnum
+from io import StringIO
 
 import requests
+from bitstring import ConstBitStream, ReadError
 from bs4 import BeautifulSoup
+from googletrans import Translator
 
 
 class Pkcs7Encoder:
@@ -66,6 +67,13 @@ def rndHex(n):
 def rndDeviceId():
     s = '-'.join([rndHex(8), rndHex(4), rndHex(4), rndHex(4), rndHex(12)])
     return s
+
+def rndUcid():
+    s = "-".join([rndHex(8), rndHex(4), rndHex(4), rndHex(4), rndHex(12)])
+    s = s.lower()
+    t = str(int(time.time()*1000))
+    u = "TAMABQc="
+    return ":".join([s, t, u])
 
 
 def isIn(command, string_to_search):

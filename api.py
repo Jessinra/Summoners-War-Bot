@@ -19,7 +19,8 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from island_maps import IslandMaps
 from mapping import dungeon_quest_map
-from tools import checkAndroidApk, find, isIn, list_to_dict, updateDict
+from tools import (checkAndroidApk, find, isIn, list_to_dict, rndUcid,
+                   updateDict)
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -1879,8 +1880,8 @@ class API(object):
                 ("binary_size", self.binary_size),
                 ("binary_check", self.binary_check),
                 ("create_if_not_exist", 0),
-                ("ag_cert_result", 0),
-                ("ag_ucid", ""),
+                ("ag_cert_result", 1),
+                ("ag_ucid", rndUcid()),
             ]
         )
         res = self.call_api(self.c2_api, data)
