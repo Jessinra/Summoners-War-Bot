@@ -120,6 +120,11 @@ class QPYOU(object):
         self.guest_uid = res['guest_uid']
         return res
 
+    def bind(self, guest_uid, hive_uid):
+        res = json.loads(self.s.post(f"https://hub.qpyou.cn/guest/bind/{guest_uid}/{hive_uid}", data=self.p1 % (self.hive_country)).content)
+        self.guest_uid = None
+        return res
+
     def auth(self):
         return json.loads(self.s.post('https://api.qpyou.cn/guest/auth', data=self.p2 % (self.guest_uid)).content)
 
