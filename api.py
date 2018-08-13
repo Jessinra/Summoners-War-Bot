@@ -14,9 +14,9 @@ from random import randint
 import requests
 import urllib3
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 from urllib3.exceptions import InsecureRequestWarning
 
-from fake_useragent import UserAgent
 from island_maps import IslandMaps
 from mapping import dungeon_quest_map
 from tools import checkAndroidApk, find, isIn, list_to_dict, updateDict
@@ -1515,6 +1515,16 @@ class API(object):
             res = self.HubUserLogin()
         else:
             res = self.GuestLogin()
+        return res
+
+    def CheckCandidateUid(self, guest_uid, hive_uid, wizard_id):
+        data = OrderedDict([("command", "CheckCandidateUid"), ("proto_ver", self.proto_ver), ("infocsv", self.infocsv), ("uid", guest_uid), ("channel_uid", guest_uid), ("candidate_uid", hive_uid), ("wizard_id", wizard_id)])
+        res = self.call_api(self.c2_api, data)
+        return res
+
+    def ProcessGuestTransition(self, guest_uid, hive_uid, wizard_id, use_old=0):
+        data = OrderedDict([("command", "ProcessGuestTransition"), ("proto_ver", self.proto_ver), ("infocsv", self.infocsv), ("uid", guest_uid), ("channel_uid", hive_uid), ("did", self.did), ("game_index", self.game_index), ("wizard_id", wizard_id), ("candidate_uid", hive_uid), ("use_old", use_old)])
+        res = self.call_api(self.c2_api, data)
         return res
 
     def HubUserLogin(self):
