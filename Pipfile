@@ -14,11 +14,9 @@ bitstring = "*"
 fake-useragent = "*"
 
 [dev-packages]
-flake8 = "*"
-pylint = "*"
 black = "*"
-pydocstyle = "*"
 rope = "*"
+pylama = "*"
 
 [requires]
 python_version = "3.6"
