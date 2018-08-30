@@ -69,11 +69,12 @@ def rndDeviceId():
     return s
 
 def rndUcid():
+    app_guard_license = "TAMABQc="
+    app_guard_hash_key = "18d28cc659998d281315b398879c2058"
     s = "-".join([rndHex(8), rndHex(4), rndHex(4), rndHex(4), rndHex(12)])
     s = s.lower()
     t = str(int(time.time()*1000))
-    u = "TAMABQc="
-    return ":".join([s, t, u])
+    return ":".join([s, t, app_guard_license])
 
 
 def isIn(command, string_to_search):
