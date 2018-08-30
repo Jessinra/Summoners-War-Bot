@@ -29,11 +29,11 @@ class API(object):
 
     USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 7.0.0; SM-G955F Build/NRD90M)"
     USER_AGENT_SCRAPE = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-    APP_VERSION = "4.0.4"
+    APP_VERSION = "4.0.5"
     GAME_INDEX = 2624
-    PROTO_VER = 11210
-    BINARY_SIZE = 29469585
-    BINARY_CHECK = "4fd2c2bdd606b81fe2f58176a1072866"
+    PROTO_VER = 11220
+    BINARY_SIZE = 29588835
+    BINARY_CHECK = "575fc35955f2e3bcce6926b997870643"
 
     def __init__(
         self,
