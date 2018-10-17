@@ -21,6 +21,11 @@ rope = "*"
 "flake8-mypy" = "*"
 "flake8-docstrings" = "*"
 "flake8-bugbear" = "*"
+"flake8-alfred" = "*"
+"flake8-author" = "*"
+"flake8-builtins" = "*"
+"flake8-deprecated" = "*"
+"flake8-import-order" = "*"
 
 [requires]
 python_version = "3.6"
